@@ -1,0 +1,217 @@
+package com.example.smsforward
+
+import android.content.Context
+import org.json.JSONArray
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
+/**
+ * 转发核心（仅使用 Android 系统自带 API，零第三方依赖）：
+ * 短信到达 -> 关键词过滤 -> [可选] Hachimi AI 分类/摘要 -> Telegram Bot API
+ * AI 步骤任何失败都会自动降级为原文转发，不阻塞主流程。
+ *
+ * 注意：所有网络调用都在后台线程执行，切勿在主线程调用。
+ */
+object Forwarder {
+
+    private const val HACHIMI_BASE = "https://ai.hachimi.online/v1"
+
+    // ai.hachimi.online 背后有 Cloudflare，需要浏览器 UA 否则可能被 403
+    private const val BROWSER_UA =
+        "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36"
+
+    data class AiResult(val forward: Boolean, val type: String, val summary: String)
+
+    fun handleSms(context: Context, from: String, body: String, timestamp: Long) {
+        val token = Settings.getTelegramToken(context)
+        val chatId = Settings.getTelegramChatId(context)
+        if (token.isBlank() || chatId.isBlank()) return // 还没配置好，直接丢弃
+
+        // 关键词过滤：配置了关键词且一条都没命中 -> 不转发
+        val keywords = Settings.getKeywordList(context)
+        if (keywords.isNotEmpty() && keywords.none { body.contains(it, ignoreCase = true) }) return
+
+        var aiNote: String? = null
+        var shouldForward = true
+
+        if (Settings.isAiEnabled(context)) {
+            val key = Settings.getHachimiKey(context)
+            if (key.isNotBlank()) {
+                // 超时或解析失败 -> result 为 null -> 按原文转发
+                val result = classifyViaHachimi(key, Settings.getHachimiModel(context), from, body)
+                if (result != null) {
+                    shouldForward = result.forward
+                    if (result.summary.isNotBlank()) {
+                        aiNote = "🤖 ${result.type}：${result.summary}"
+                    }
+                }
+            }
+        }
+        if (!shouldForward) return // AI 判定为垃圾短信
+
+        val time = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+            .format(Date(timestamp))
+        val text = buildString {
+            append("📩 新短信\n")
+            append("发件人：").append(from).append('\n')
+            append("时间：").append(time).append('\n')
+            if (aiNote != null) append(aiNote).append('\n')
+            append("内容：\n").append(body)
+        }
+        sendTelegram(token, chatId, text)
+    }
+
+    /** 发一条消息到 Telegram，返回是否成功 */
+    fun sendTelegram(token: String, chatId: String, text: String): Boolean {
+        val payload = JSONObject()
+            .put("chat_id", chatId)
+            .put("text", text)
+            .toString()
+        val resp = postJson(
+            url = "https://api.telegram.org/bot$token/sendMessage",
+            payload = payload,
+            authKey = null,
+            timeoutMs = 15000
+        )
+        return resp != null && JSONObject(resp).optBoolean("ok", false)
+    }
+
+    /**
+     * 用 Hachimi (OpenAI 兼容接口) 给短信分类 + 一句话摘要。
+     * 严格只要求模型输出 JSON，解析失败返回 null。
+     */
+    private fun classifyViaHachimi(
+        key: String,
+        model: String,
+        from: String,
+        body: String
+    ): AiResult? {
+        return try {
+            val system = "你是短信预处理助手。判断这条短信是否值得转发到用户手机" +
+                "(验证码、银行/支付通知、快递物流、政务/运营商重要通知值得转；营销广告、垃圾短信不值得转)，" +
+                "并用一句话中文概括内容。严格只输出 JSON，不要输出其他任何内容，格式：" +
+                "{\"forward\":true,\"type\":\"验证码\",\"summary\":\"...\"}"
+            val payload = JSONObject()
+                .put("model", model)
+                .put("temperature", 0.2)
+                .put("max_tokens", 200)
+                .put(
+                    "messages", JSONArray()
+                        .put(JSONObject().put("role", "system").put("content", system))
+                        .put(
+                            JSONObject().put("role", "user")
+                                .put("content", "发件人：$from\n内容：$body")
+                        )
+                )
+                .toString()
+            val resp = postJson(
+                url = "$HACHIMI_BASE/chat/completions",
+                payload = payload,
+                authKey = key,
+                timeoutMs = 15000
+            ) ?: return null
+            val content = JSONObject(resp)
+                .getJSONArray("choices")
+                .getJSONObject(0)
+                .getJSONObject("message")
+                .getString("content")
+            // 宽松提取第一段 {...}
+            val start = content.indexOf('{')
+            val end = content.lastIndexOf('}')
+            if (start < 0 || end <= start) return null
+            val obj = JSONObject(content.substring(start, end + 1))
+            AiResult(
+                forward = obj.optBoolean("forward", true),
+                type = obj.optString("type", "其他"),
+                summary = obj.optString("summary", "")
+            )
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /**
+     * 连通性自检：发两个答案不同的极简问题，
+     * 如果两次回答一模一样，说明对端是固定回复/假管道。
+     * 返回一段可直接显示给用户的中文结论。
+     */
+    fun testHachimi(key: String, model: String): String {
+        if (key.isBlank()) return "请先填写 Hachimi API Key"
+        return try {
+            val a1 = chatOnce(key, model, "只回复数字 7，不要输出其他任何内容。")
+                ?: return "第 1 次请求失败：检查 Key / 模型名 / 网络"
+            val a2 = chatOnce(key, model, "只回复数字 3，不要输出其他任何内容。")
+                ?: return "第 2 次请求失败：检查 Key / 模型名 / 网络"
+            if (a1.trim() == a2.trim()) {
+                "⚠️ 两次不同问题的回答完全一样（均为：${a1.trim().take(40)}），" +
+                    "这条线路疑似返回固定内容，AI 分类功能可能不可用，建议保持关闭。"
+            } else {
+                "✅ Hachimi 连通且返回正常（两次回答不同），可以启用 AI 预处理。"
+            }
+        } catch (e: Exception) {
+            "请求异常：${e.message}"
+        }
+    }
+
+    private fun chatOnce(key: String, model: String, prompt: String): String? {
+        return try {
+            val payload = JSONObject()
+                .put("model", model)
+                .put("temperature", 0.0)
+                .put("max_tokens", 50)
+                .put(
+                    "messages", JSONArray()
+                        .put(JSONObject().put("role", "user").put("content", prompt))
+                )
+                .toString()
+            val resp = postJson(
+                url = "$HACHIMI_BASE/chat/completions",
+                payload = payload,
+                authKey = key,
+                timeoutMs = 15000
+            ) ?: return null
+            JSONObject(resp)
+                .getJSONArray("choices")
+                .getJSONObject(0)
+                .getJSONObject("message")
+                .getString("content")
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /** 通用 JSON POST，成功返回响应体字符串，失败返回 null */
+    private fun postJson(
+        url: String,
+        payload: String,
+        authKey: String?,
+        timeoutMs: Int
+    ): String? {
+        var conn: HttpURLConnection? = null
+        return try {
+            conn = URL(url).openConnection() as HttpURLConnection
+            conn.requestMethod = "POST"
+            conn.doOutput = true
+            conn.connectTimeout = 10000
+            conn.readTimeout = timeoutMs
+            conn.setRequestProperty("Content-Type", "application/json; charset=utf-8")
+            conn.setRequestProperty("User-Agent", BROWSER_UA)
+            if (authKey != null) conn.setRequestProperty("Authorization", "Bearer $authKey")
+            conn.outputStream.use { it.write(payload.toByteArray(Charsets.UTF_8)) }
+            val code = conn.responseCode
+            if (code in 200..299) {
+                conn.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
+        } finally {
+            conn?.disconnect()
+        }
+    }
+}

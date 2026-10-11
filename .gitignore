@@ -1,0 +1,21 @@
+*.idsig
+*.log
+/local.properties
+
+# Gradle
+.gradle/
+build/
+app/build/
+build-manual/
+
+# IDE
+*.iml
+.idea/
+
+# Signing keys (never commit)
+*.jks
+*.keystore
+
+# Build outputs
+*.apk
+*.zip
