@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 液态玻璃顶栏：柔和的顶部镜面高光 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners android:radius="28dp" />
+    <gradient
+        android:angle="270"
+        android:startColor="#73FFFFFF"
+        android:endColor="#00FFFFFF" />
+</shape>

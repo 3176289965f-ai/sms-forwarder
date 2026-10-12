@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 通透玻璃主题配色：浅空蓝底 + 半透明白面板 + 靛蓝点缀 -->
+    <color name="glass_text_primary">#1A2242</color>
+    <color name="glass_text_secondary">#5C6B8A</color>
+    <color name="glass_text_hint">#8A97B5</color>
+    <color name="glass_accent">#4E63FF</color>
+    <color name="glass_accent2">#9B5CFF</color>
+    <color name="glass_bg_top">#C7DEFF</color>
+    <color name="glass_bg_bottom">#EBDFFF</color>
+    <color name="ic_launcher_background">#FF000000</color>
+</resources>

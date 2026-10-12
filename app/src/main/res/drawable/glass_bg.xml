@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- App 背景：浅空蓝 → 淡薰衣草紫纵向渐变 + 顶部白色径向光晕 + 底部靛蓝微光。
+     注意：全部使用渐变绘制，没有使用任何模糊（blur）效果。 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:startColor="@color/glass_bg_top"
+                android:endColor="@color/glass_bg_bottom" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="520dp"
+                android:centerX="0.5"
+                android:centerY="0.0"
+                android:startColor="#8CFFFFFF"
+                android:endColor="#00FFFFFF" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="620dp"
+                android:centerX="0.85"
+                android:centerY="1.0"
+                android:startColor="#2E4E63FF"
+                android:endColor="#002E4E63" />
+        </shape>
+    </item>
+</layer-list>

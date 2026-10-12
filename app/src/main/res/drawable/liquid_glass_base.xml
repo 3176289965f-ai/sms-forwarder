@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 液态玻璃顶栏：极淡底色（通透优先） -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners android:radius="28dp" />
+    <gradient
+        android:angle="270"
+        android:startColor="#1FC7DEFF"
+        android:endColor="#1FEBDFFF" />
+</shape>

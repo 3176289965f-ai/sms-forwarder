@@ -27,9 +27,25 @@ object Forwarder {
     data class AiResult(val forward: Boolean, val type: String, val summary: String)
 
     fun handleSms(context: Context, from: String, body: String, timestamp: Long) {
-        val token = Settings.getTelegramToken(context)
-        val chatId = Settings.getTelegramChatId(context)
-        if (token.isBlank() || chatId.isBlank()) return // 还没配置好，直接丢弃
+        val target = Settings.getForwardTarget(context)
+        val doTelegram = target == Settings.TARGET_TELEGRAM || target == Settings.TARGET_BOTH
+        val doWechat = target == Settings.TARGET_WECHAT || target == Settings.TARGET_BOTH
+
+        val tgToken = Settings.getTelegramToken(context)
+        val tgChatId = Settings.getTelegramChatId(context)
+        val tgReady = tgToken.isNotBlank() && tgChatId.isNotBlank()
+
+        val ocBaseUrl = Settings.getOcBaseUrl(context)
+        val ocToken = Settings.getOcToken(context)
+        val ocSendPath = Settings.getOcSendPath(context)
+        val wechatTarget = Settings.getWechatTarget(context)
+        val wxReady = ocBaseUrl.isNotBlank() && wechatTarget.isNotBlank()
+
+        // 选中的目标一个都没配好 -> 直接丢弃
+        if ((doTelegram && !tgReady && !doWechat) ||
+            (doWechat && !wxReady && !doTelegram) ||
+            (doTelegram && doWechat && !tgReady && !wxReady)
+        ) return
 
         // 关键词过滤：配置了关键词且一条都没命中 -> 不转发
         val keywords = Settings.getKeywordList(context)
@@ -62,7 +78,40 @@ object Forwarder {
             if (aiNote != null) append(aiNote).append('\n')
             append("内容：\n").append(body)
         }
-        sendTelegram(token, chatId, text)
+        if (doTelegram && tgReady) {
+            sendTelegram(tgToken, tgChatId, text)
+        }
+        if (doWechat && wxReady) {
+            OpenClaw.send(ocBaseUrl, ocSendPath, ocToken, wechatTarget, text)
+        }
+    }
+
+    /**
+     * 微信 ClawBot 连通性自检：发一条测试消息到微信目标，
+     * 返回一段可直接显示给用户的中文结论。
+     */
+    fun testWechat(
+        baseUrl: String,
+        sendPath: String,
+        token: String,
+        target: String
+    ): String {
+        if (baseUrl.isBlank()) return "请先填写 OpenClaw 网关地址"
+        if (target.isBlank()) return "请先填写微信目标 ID"
+        return try {
+            val ok = OpenClaw.send(
+                baseUrl, sendPath, token, target,
+                "✅ 短信转发测试：微信 ClawBot 配置成功！之后这台手机收到的短信会转发到这里。"
+            )
+            if (ok) {
+                "✅ 微信 ClawBot 测试成功，去微信里看看吧"
+            } else {
+                "❌ 微信发送失败：检查网关地址 / 发送路径 / Token / 目标 ID，" +
+                    "并确认网关正在运行、微信已扫码登录（openclaw channels login --channel openclaw-weixin）"
+            }
+        } catch (e: Exception) {
+            "请求异常：${e.message}"
+        }
     }
 
     /** 发一条消息到 Telegram，返回是否成功 */

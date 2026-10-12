@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 次按钮：带水波纹（ripple，非模糊） -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#40000000">
+    <item android:drawable="@drawable/glass_btn_secondary_bg" />
+</ripple>

@@ -1,134 +1,574 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- v2.2 液态玻璃顶栏：顶栏固定，内容从下方穿过时做折射；无模糊 -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Telegram 设置"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Bot Token（找 @BotFather 创建机器人后获得）" />
-
-        <EditText
-            android:id="@+id/etToken"
+        <LinearLayout
+            android:id="@+id/contentLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="例如 123456:ABC-DEF…"
-            android:inputType="text"
-            android:importantForAutofill="no" />
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="84dp"
+            android:paddingBottom="16dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Chat ID（你的 Telegram 数字 ID）" />
+            <!-- 转发目标 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/glass_card"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-        <EditText
-            android:id="@+id/etChatId"
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/glass_accent_bar" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="转发目标"
+                        android:textColor="@color/glass_text_primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <RadioGroup
+                    android:id="@+id/rgTarget"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:id="@+id/rbTelegram"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="@color/glass_accent"
+                        android:text="Telegram（默认）"
+                        android:textColor="@color/glass_text_primary"
+                        android:textSize="15sp" />
+
+                    <RadioButton
+                        android:id="@+id/rbWechat"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="@color/glass_accent"
+                        android:text="微信 ClawBot（经由 OpenClaw 网关）"
+                        android:textColor="@color/glass_text_primary"
+                        android:textSize="15sp" />
+
+                    <RadioButton
+                        android:id="@+id/rbBoth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="@color/glass_accent"
+                        android:text="两者都发"
+                        android:textColor="@color/glass_text_primary"
+                        android:textSize="15sp" />
+                </RadioGroup>
+            </LinearLayout>
+
+            <!-- Telegram 设置 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/glass_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/glass_accent_bar" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Telegram 设置"
+                        android:textColor="@color/glass_text_primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Bot Token（找 @BotFather 创建机器人后获得）"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etToken"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/glass_input"
+                    android:hint="例如 123456:ABC-DEF…"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:padding="12dp"
+                    android:singleLine="true"
+                    android:textColor="@color/glass_text_primary"
+                    android:textColorHint="@color/glass_text_hint"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Chat ID（你的 Telegram 数字 ID）"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etChatId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/glass_input"
+                    android:hint="例如 123456789"
+                    android:inputType="number"
+                    android:padding="12dp"
+                    android:singleLine="true"
+                    android:textColor="@color/glass_text_primary"
+                    android:textColorHint="@color/glass_text_hint"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <!-- 微信 ClawBot 设置 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/glass_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/glass_accent_bar" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="微信 ClawBot 设置"
+                        android:textColor="@color/glass_text_primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="先在电脑/服务器上装好 OpenClaw 网关并登录微信：\n① npx -y @tencent-weixin/openclaw-weixin-cli@latest install\n② openclaw channels login --channel openclaw-weixin（微信扫码）\n③ 用 openclaw message channel list 查目标 ID\n④ 保证手机能访问网关地址（同一 Wi-Fi 填内网 IP）"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="OpenClaw 网关地址"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etOcBaseUrl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/glass_input"
+                    android:hint="例如 http://192.168.1.10:18789"
+                    android:importantForAutofill="no"
+                    android:inputType="textUri"
+                    android:padding="12dp"
+                    android:singleLine="true"
+                    android:textColor="@color/glass_text_primary"
+                    android:textColorHint="@color/glass_text_hint"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="网关 API Token"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etOcToken"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/glass_input"
+                    android:hint="OpenClaw 配置里的 gateway token"
+                    android:importantForAutofill="no"
+                    android:inputType="textPassword"
+                    android:padding="12dp"
+                    android:singleLine="true"
+                    android:textColor="@color/glass_text_primary"
+                    android:textColorHint="@color/glass_text_hint"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="微信目标 ID"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etWechatTarget"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/glass_input"
+                    android:hint="openclaw message channel list 查得的目标 ID"
+                    android:inputType="text"
+                    android:padding="12dp"
+                    android:singleLine="true"
+                    android:textColor="@color/glass_text_primary"
+                    android:textColorHint="@color/glass_text_hint"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="发送路径（高级，一般不用改）"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etOcSendPath"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/glass_input"
+                    android:hint="/rpc"
+                    android:inputType="text"
+                    android:padding="12dp"
+                    android:singleLine="true"
+                    android:textColor="@color/glass_text_primary"
+                    android:textColorHint="@color/glass_text_hint"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <!-- Hachimi AI -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/glass_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/glass_accent_bar" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Hachimi AI 预处理（实验性）"
+                        android:textColor="@color/glass_text_primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <Switch
+                    android:id="@+id/swAi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="启用 AI 分类 / 摘要 / 垃圾过滤"
+                    android:textColor="@color/glass_text_primary"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Hachimi API Key"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etHachimiKey"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/glass_input"
+                    android:hint="粘贴你的 Key"
+                    android:importantForAutofill="no"
+                    android:inputType="textPassword"
+                    android:padding="12dp"
+                    android:singleLine="true"
+                    android:textColor="@color/glass_text_primary"
+                    android:textColorHint="@color/glass_text_hint"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="模型名"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etModel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/glass_input"
+                    android:hint="gpt-6-astra"
+                    android:inputType="text"
+                    android:padding="12dp"
+                    android:singleLine="true"
+                    android:textColor="@color/glass_text_primary"
+                    android:textColorHint="@color/glass_text_hint"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <!-- 关键词过滤 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/glass_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/glass_accent_bar" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="关键词过滤（可选）"
+                        android:textColor="@color/glass_text_primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/etKeywords"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/glass_input"
+                    android:hint="逗号分隔，如：验证码,银行。留空则转发全部短信"
+                    android:inputType="text"
+                    android:padding="12dp"
+                    android:textColor="@color/glass_text_primary"
+                    android:textColorHint="@color/glass_text_hint"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <!-- 保活提示 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/glass_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/glass_accent_bar" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="保活设置（国产 ROM 必看）"
+                        android:textColor="@color/glass_text_primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="设置 → 电池 → 短信转发 → 无限制 / 允许后台活动；允许自启动；把 App 锁定在多任务后台。\n微信通道还要求 OpenClaw 网关设备长期在线。"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <!-- 操作按钮 -->
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/glass_btn_primary"
+                android:padding="14dp"
+                android:text="保存设置"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnTestTelegram"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/glass_btn_secondary"
+                android:padding="12dp"
+                android:text="测试 Telegram 转发"
+                android:textColor="@color/glass_text_primary"
+                android:textSize="15sp" />
+
+            <Button
+                android:id="@+id/btnTestWechat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/glass_btn_secondary"
+                android:padding="12dp"
+                android:text="测试微信 ClawBot 转发"
+                android:textColor="@color/glass_text_primary"
+                android:textSize="15sp" />
+
+            <Button
+                android:id="@+id/btnTestAi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/glass_btn_secondary"
+                android:padding="12dp"
+                android:text="测试 Hachimi 连通性"
+                android:textColor="@color/glass_text_primary"
+                android:textSize="15sp" />
+
+            <!-- 状态卡 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/glass_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="状态：等待配置"
+                    android:textColor="@color/glass_text_primary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- 液态玻璃顶栏：固定在顶部，内容从下方穿过时产生折射 -->
+    <FrameLayout
+        android:id="@+id/liquidHeader"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="12dp">
+
+        <!-- 折射层：顶栏后方内容的实时扭曲拷贝 -->
+        <ImageView
+            android:id="@+id/refractionView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="例如 123456789"
-            android:inputType="number" />
+            android:layout_height="match_parent"
+            android:background="@drawable/liquid_glass_base"
+            android:scaleType="fitXY" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Hachimi AI 预处理（实验性）"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+        <!-- 气泡主体：融进玻璃内部左侧（tint 之下），边缘羽化，非贴图 -->
+        <ImageView
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="18dp"
+            android:alpha="0.9"
+            android:src="@drawable/header_bubbles" />
 
-        <Switch
-            android:id="@+id/swAi"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="启用 AI 分类 / 摘要 / 垃圾过滤" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Hachimi API Key" />
-
-        <EditText
-            android:id="@+id/etHachimiKey"
+        <!-- 乳白 tint -->
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="粘贴你的 Key"
-            android:inputType="textPassword"
-            android:importantForAutofill="no" />
+            android:layout_height="match_parent"
+            android:background="@drawable/liquid_tint" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="模型名" />
-
-        <EditText
-            android:id="@+id/etModel"
+        <!-- 顶部镜面高光 -->
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="gpt-6-astra"
-            android:inputType="text" />
+            android:layout_height="match_parent"
+            android:background="@drawable/liquid_sheen" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="关键词过滤（可选）"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/etKeywords"
+        <!-- 明亮细边框 -->
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="逗号分隔，如：验证码,银行。留空则转发全部短信"
-            android:inputType="text" />
+            android:layout_height="match_parent"
+            android:background="@drawable/liquid_glass_edge" />
 
-        <Button
-            android:id="@+id/btnSave"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="保存设置" />
+    </FrameLayout>
 
-        <Button
-            android:id="@+id/btnTestTelegram"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="测试 Telegram 转发" />
-
-        <Button
-            android:id="@+id/btnTestAi"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="测试 Hachimi 连通性" />
-
-        <TextView
-            android:id="@+id/tvStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="状态：等待配置"
-            android:textSize="14sp" />
-
-    </LinearLayout>
-</ScrollView>
+</FrameLayout>

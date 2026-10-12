@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.SmsForwarder" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- 通透玻璃主题：无模糊（no blur），靠半透明面板 + 高光渐变营造玻璃感 -->
+    <style name="Theme.SmsForwarder" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/glass_bg</item>
+    </style>
 </resources>
