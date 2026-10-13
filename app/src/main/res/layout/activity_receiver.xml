@@ -173,54 +173,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="服务每 10 秒轮询一次中转，有新短信就弹通知。\n保活：设置 → 电池 → 短信转发 → 无限制；允许自启动；锁定后台。\n通知栏会常驻一条「短信转发 · 接收中」，不要划掉。"
+                    android:text="服务每 10 秒轮询一次中转，有新短信就弹通知。\n点通知栏常驻通知可回到本页。"
                     android:textColor="@color/glass_text_secondary"
                     android:textSize="13sp" />
 
                 <Button
-                    android:id="@+id/btnBatteryWhitelist"
+                    android:id="@+id/btnKeepAlive"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:background="@drawable/glass_btn_secondary"
                     android:padding="12dp"
-                    android:text="加入电池优化白名单（一键）"
+                    android:text="☰ 保活设置"
                     android:textColor="@color/glass_text_primary"
                     android:textSize="14sp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="后台隐藏"
-                            android:textColor="@color/glass_text_primary"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="在「最近任务」隐藏卡片，防手滑划掉"
-                            android:textColor="@color/glass_text_secondary"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <Switch
-                        android:id="@+id/swHideRecents"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                </LinearLayout>
             </LinearLayout>
 
             <!-- 收件箱 -->
@@ -356,5 +322,130 @@
             android:background="@drawable/liquid_glass_edge" />
 
     </FrameLayout>
+
+    <!-- 保活设置侧边栏：遮罩 + 左滑面板 -->
+    <View
+        android:id="@+id/drawerScrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:background="#80000000"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/drawerPanel"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@drawable/drawer_panel"
+        android:elevation="16dp"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:visibility="invisible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="保活设置"
+            android:textColor="@color/glass_text_primary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="设置 → 电池 → 短信转发 → 无限制；允许自启动；锁定后台。\n通知栏常驻通知不要划掉，点它可回到本页。"
+            android:textColor="@color/glass_text_secondary"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btnBatteryWhitelist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/glass_btn_secondary"
+            android:padding="12dp"
+            android:text="加入电池优化白名单（一键）"
+            android:textColor="@color/glass_text_primary"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="后台隐藏"
+                    android:textColor="@color/glass_text_primary"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="在「最近任务」隐藏卡片，防手滑划掉"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <Switch
+                android:id="@+id/swHideRecents"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="隐藏常驻通知"
+                    android:textColor="@color/glass_text_primary"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="前台服务不变，只是通知不再显示图标"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <Switch
+                android:id="@+id/swHideNotif"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:text="点击空白处关闭"
+            android:textColor="@color/glass_text_hint"
+            android:textSize="12sp" />
+    </LinearLayout>
 
 </FrameLayout>

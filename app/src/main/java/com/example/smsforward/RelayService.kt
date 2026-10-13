@@ -24,6 +24,7 @@ class RelayService : Service() {
     companion object {
         const val ACTION_START = "com.example.smsforward.relay.START"
         const val ACTION_STOP = "com.example.smsforward.relay.STOP"
+        const val ACTION_UPDATE_CHANNEL = "com.example.smsforward.relay.UPDATE_CHANNEL"
         private const val POLL_MS = 10_000L
         private const val CH_STATUS = "relay_status"
         private const val CH_SMS = "sms_incoming"
@@ -33,6 +34,8 @@ class RelayService : Service() {
     @Volatile
     private var running = false
     private var worker: Thread? = null
+    @Volatile
+    private var lastStatus: String = "正在连接中转…"
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -41,6 +44,14 @@ class RelayService : Service() {
             ACTION_STOP -> {
                 stopSelf()
                 return START_NOT_STICKY
+            }
+            ACTION_UPDATE_CHANNEL -> {
+                // 隐藏常驻通知开关变化时：重建状态通道并刷新通知
+                if (running) {
+                    createChannels()
+                    updateStatus(lastStatus)
+                }
+                return START_STICKY
             }
         }
         if (running) return START_STICKY
@@ -101,18 +112,31 @@ class RelayService : Service() {
     private fun createChannels() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        // 状态通道的重要性跟随"隐藏常驻通知"开关：先删后建才能让新重要性生效。
+        // IMPORTANCE_MIN = 不显示状态栏图标、沉底（前台服务保活不受影响）。
+        try {
+            nm.deleteNotificationChannel(CH_STATUS)
+        } catch (_: Exception) {
+        }
+        val statusImportance = if (Settings.isHideStatusNotif(this))
+            NotificationManager.IMPORTANCE_MIN
+        else
+            NotificationManager.IMPORTANCE_LOW
         nm.createNotificationChannel(
             NotificationChannel(
                 CH_STATUS, "中转服务状态",
-                NotificationManager.IMPORTANCE_LOW
+                statusImportance
             ).apply { description = "短信中转接收服务的常驻状态通知" }
         )
-        nm.createNotificationChannel(
-            NotificationChannel(
-                CH_SMS, "收到的短信",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply { description = "从发送端同步过来的短信" }
-        )
+        // 短信通道只建一次，不删（避免清掉用户手动调过的设置）
+        if (nm.getNotificationChannel(CH_SMS) == null) {
+            nm.createNotificationChannel(
+                NotificationChannel(
+                    CH_SMS, "收到的短信",
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply { description = "从发送端同步过来的短信" }
+            )
+        }
     }
 
     private fun openAppIntent(): PendingIntent {
@@ -140,6 +164,7 @@ class RelayService : Service() {
     }
 
     private fun updateStatus(text: String) {
+        lastStatus = text
         val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         nm.notify(NOTIF_ID_STATUS, statusNotification(text))
     }

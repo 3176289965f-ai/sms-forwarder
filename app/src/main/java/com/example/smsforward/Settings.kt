@@ -138,6 +138,16 @@ object Settings {
         prefs(c).edit().putBoolean("receiver_running", v).apply()
     }
 
+    // ---- v3：隐藏常驻通知（前台服务不变，通知改为静默不显示图标）----
+
+    /** 默认关闭：保持显示常驻通知 */
+    fun isHideStatusNotif(c: Context): Boolean =
+        prefs(c).getBoolean("hide_status_notif", false)
+
+    fun setHideStatusNotif(c: Context, v: Boolean) {
+        prefs(c).edit().putBoolean("hide_status_notif", v).apply()
+    }
+
     // ---- v3：后台隐藏（GKD 式开关：在「最近任务」隐藏卡片，防手滑划掉）----
 
     /** 默认开启：跟 GKD 的「后台隐藏」开关同款行为 */

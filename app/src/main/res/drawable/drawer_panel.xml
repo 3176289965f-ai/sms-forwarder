@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 保活设置侧边栏底：浅色不透明，右侧圆角 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#F3F6FE" />
+    <corners
+        android:topRightRadius="28dp"
+        android:bottomRightRadius="28dp" />
+</shape>

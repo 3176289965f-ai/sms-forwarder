@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -27,6 +28,7 @@ class ReceiverActivity : Activity() {
     private lateinit var btnToggleService: Button
     private lateinit var tvRxStatus: TextView
     private lateinit var llInbox: LinearLayout
+    private var drawerOpen = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,7 +122,56 @@ class ReceiverActivity : Activity() {
             Settings.applyHideFromRecents(this)
         }
 
+        val swHideNotif = findViewById<Switch>(R.id.swHideNotif)
+        swHideNotif.isChecked = Settings.isHideStatusNotif(this)
+        swHideNotif.setOnCheckedChangeListener { _, checked ->
+            Settings.setHideStatusNotif(this, checked)
+            // 服务运行时立即重建通知通道并刷新，实时生效
+            if (isServiceRunning()) {
+                startService(
+                    Intent(this, RelayService::class.java)
+                        .setAction(RelayService.ACTION_UPDATE_CHANNEL)
+                )
+            }
+        }
+
+        // ---- 保活设置侧边栏 ----
+        val drawerPanel = findViewById<LinearLayout>(R.id.drawerPanel)
+        val drawerScrim = findViewById<View>(R.id.drawerScrim)
+        // 首帧先藏到屏幕左侧，避免闪现
+        drawerPanel.post { drawerPanel.translationX = -drawerPanel.width.toFloat() }
+        findViewById<Button>(R.id.btnKeepAlive).setOnClickListener { setDrawer(true) }
+        drawerScrim.setOnClickListener { setDrawer(false) }
+
         LiquidHeader.attach(this)
+    }
+
+    /** 左侧边栏开关（带遮罩淡入淡出） */
+    private fun setDrawer(open: Boolean) {
+        drawerOpen = open
+        val panel = findViewById<LinearLayout>(R.id.drawerPanel)
+        val scrim = findViewById<View>(R.id.drawerScrim)
+        if (open) {
+            panel.visibility = View.VISIBLE
+            scrim.visibility = View.VISIBLE
+            scrim.animate().alpha(0.45f).setDuration(180).start()
+            panel.animate().translationX(0f).setDuration(240).start()
+        } else {
+            scrim.animate().alpha(0f).setDuration(180).withEndAction {
+                scrim.visibility = View.GONE
+            }.start()
+            panel.animate().translationX(-panel.width.toFloat()).setDuration(240)
+                .withEndAction { panel.visibility = View.INVISIBLE }.start()
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    override fun onBackPressed() {
+        if (drawerOpen) {
+            setDrawer(false)
+            return
+        }
+        super.onBackPressed()
     }
 
     override fun onResume() {
