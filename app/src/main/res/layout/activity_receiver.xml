@@ -176,17 +176,6 @@
                     android:text="服务每 10 秒轮询一次中转，有新短信就弹通知。\n点通知栏常驻通知可回到本页。"
                     android:textColor="@color/glass_text_secondary"
                     android:textSize="13sp" />
-
-                <Button
-                    android:id="@+id/btnKeepAlive"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/glass_btn_secondary"
-                    android:padding="12dp"
-                    android:text="☰ 保活设置"
-                    android:textColor="@color/glass_text_primary"
-                    android:textSize="14sp" />
             </LinearLayout>
 
             <!-- 收件箱 -->
@@ -282,7 +271,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- 液态玻璃顶栏 -->
+    <!-- 液态玻璃顶栏（气泡图标可点：打开保活设置侧边栏，顶栏泛水波纹） -->
     <FrameLayout
         android:id="@+id/liquidHeader"
         android:layout_width="match_parent"
@@ -299,11 +288,14 @@
             android:scaleType="fitXY" />
 
         <ImageView
+            android:id="@+id/headerBubble"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_gravity="start|center_vertical"
             android:layout_marginStart="18dp"
             android:alpha="0.9"
+            android:clickable="true"
+            android:focusable="true"
             android:src="@drawable/header_bubbles" />
 
         <View
@@ -320,6 +312,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/liquid_glass_edge" />
+
+        <!-- 水波纹层：最上层，只画波浪不吃点击 -->
+        <com.example.smsforward.WaveRippleView
+            android:id="@+id/waveRipple"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
 
     </FrameLayout>
 

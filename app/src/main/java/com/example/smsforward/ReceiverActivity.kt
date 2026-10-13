@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Switch
@@ -140,8 +141,19 @@ class ReceiverActivity : Activity() {
         val drawerScrim = findViewById<View>(R.id.drawerScrim)
         // 首帧先藏到屏幕左侧，避免闪现
         drawerPanel.post { drawerPanel.translationX = -drawerPanel.width.toFloat() }
-        findViewById<Button>(R.id.btnKeepAlive).setOnClickListener { setDrawer(true) }
         drawerScrim.setOnClickListener { setDrawer(false) }
+
+        // ---- 左上角气泡：打开侧边栏，顶栏泛水波纹（气泡本身不做任何视觉修改） ----
+        val bubble = findViewById<ImageView>(R.id.headerBubble)
+        val wave = findViewById<WaveRippleView>(R.id.waveRipple)
+        bubble.setOnClickListener {
+            // 以气泡中心为圆心，在液态玻璃上荡开水波纹
+            val cx = bubble.left + bubble.width / 2f
+            val cy = bubble.top + bubble.height / 2f
+            wave.startRipple(cx, cy)
+            // 稍晚一点再滑出侧边栏，让波浪先泛开（否则抽屉立刻盖住顶栏）
+            bubble.postDelayed({ setDrawer(true) }, 380)
+        }
 
         LiquidHeader.attach(this)
     }
