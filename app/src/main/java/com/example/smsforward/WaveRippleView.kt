@@ -11,15 +11,20 @@ import android.graphics.Path
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
-import android.view.animation.DecelerateInterpolator
+import android.view.animation.LinearInterpolator
 import kotlin.math.cos
+import kotlin.math.pow
 import kotlin.math.sin
+import kotlin.math.sqrt
 
 /**
- * 液态玻璃顶栏上的水波纹。
+ * 液态玻璃顶栏上的水波纹（尽量符合真实水波物理）。
  *
- * 点左上角气泡时，以气泡为中心泛起横向波浪（椭圆波环 + 正弦起伏，
- * 模拟水波在玻璃上荡开），约 1.5 秒后淡出。
+ * 点左上角气泡时，以气泡为落水点泛起涟漪：
+ * - 波前近匀速扩张（石头落水的重力波波前速度近恒定），全程约 3 秒；
+ * - 色散：外圈波长更长（长波跑得快），内圈细密；
+ * - 振幅按柱面扩散衰减（~1/sqrt(r)），越远越淡；
+ * - 开头有一小团落水水花，随即化作涟漪。
  *
  * 盖在顶栏最上层，只负责画，不吃点击（触摸会透下去给气泡）。
  */
@@ -32,6 +37,9 @@ class WaveRippleView @JvmOverloads constructor(
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeCap = Paint.Cap.ROUND
+    }
+    private val splashPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
     }
     private val path = Path()
     private val clipPath = Path()
@@ -56,15 +64,15 @@ class WaveRippleView @JvmOverloads constructor(
         )
     }
 
-    /** 以 (cx, cy) 为中心泛起波浪 */
+    /** 以 (cx, cy) 为落水点泛起涟漪 */
     fun startRipple(cx: Float, cy: Float) {
         this.cx = cx
         this.cy = cy
         animator?.cancel()
         visibility = View.VISIBLE
         animator = ValueAnimator.ofFloat(0f, 1f).apply {
-            duration = 1500
-            interpolator = DecelerateInterpolator()
+            duration = 3000L
+            interpolator = LinearInterpolator()
             addUpdateListener { invalidate() }
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
@@ -77,30 +85,35 @@ class WaveRippleView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        val p = (animator?.animatedValue as? Float) ?: return
+        val tn = (animator?.animatedValue as? Float) ?: return
         canvas.save()
         canvas.clipPath(clipPath)
-        // 石头落水式涟漪：一圈圈细密、等间距向外荡开，振幅随距离衰减
+
         val maxR = width * 0.85f
-        val count = 10
-        val wavelength = maxR / (count - 1)
-        val travel = maxR * 1.15f // 整个动画期间波前走过的距离
-        for (i in 0 until count + 2) {
-            val r = p * travel - i * wavelength
+        // 波前：近匀速扩张（指数 0.92 略带初速感）
+        val front = maxR * tn.toDouble().pow(0.92).toFloat()
+
+        // 涟漪列：色散，外圈波长更长
+        val count = 12
+        val lambda0 = maxR / 16f
+        var s = 0f
+        for (i in 0 until count) {
+            val r = front - s
+            s += lambda0 * (1f + 0.9f * i / count)
             if (r <= 4f * density || r > maxR) continue
-            val fade = 1f - r / maxR // 离中心越远越淡
-            val alpha = (fade * 170).toInt().coerceIn(0, 255)
+            val decay = sqrt(1f - r / maxR) // 柱面扩散衰减
+            val alpha = (decay * 170f * (1f - 0.25f * tn)).toInt().coerceIn(0, 255)
             paint.color = Color.argb(alpha, 90, 110, 255)
             paint.strokeWidth = 2.5f * density
             val ry = r * 0.36f
-            // 轻微正弦起伏，有机水波感
-            val wobbleAmp = 6f * density * fade
-            val phase = p * 10f + i * 1.3f
+            // 轻微正弦起伏，有机水波感（真实涟漪接近正圆，起伏要小）
+            val wobbleAmp = 4f * density * decay
+            val phase = tn * 8f + i * 1.1f
             path.reset()
             val steps = 90
             for (k in 0..steps) {
                 val a = k.toFloat() / steps * (Math.PI * 2).toFloat()
-                val w = 1f + wobbleAmp * sin(7f * a + phase) / r.coerceAtLeast(1f)
+                val w = 1f + wobbleAmp * sin(5f * a + phase) / r.coerceAtLeast(1f)
                 val px = cx + r * w * cos(a)
                 val py = cy + ry * w * sin(a)
                 if (k == 0) path.moveTo(px, py) else path.lineTo(px, py)
@@ -108,6 +121,14 @@ class WaveRippleView @JvmOverloads constructor(
             path.close()
             canvas.drawPath(path, paint)
         }
+
+        // 落水点的初始水花：小圆盘迅速铺开并消失
+        if (tn < 0.12f) {
+            val sp = tn / 0.12f
+            splashPaint.color = Color.argb((120 * (1f - sp)).toInt(), 90, 110, 255)
+            canvas.drawCircle(cx, cy, 36f * density * sp, splashPaint)
+        }
+
         canvas.restore()
     }
 }
