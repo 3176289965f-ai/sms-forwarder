@@ -27,9 +27,15 @@ object Forwarder {
     data class AiResult(val forward: Boolean, val type: String, val summary: String)
 
     fun handleSms(context: Context, from: String, body: String, timestamp: Long) {
+        // v3：只有发送端才处理短信
+        if (Settings.getRole(context) != Settings.ROLE_SENDER &&
+            Settings.getRole(context) != Settings.ROLE_UNSET
+        ) return
+
         val target = Settings.getForwardTarget(context)
         val doTelegram = target == Settings.TARGET_TELEGRAM || target == Settings.TARGET_BOTH
         val doWechat = target == Settings.TARGET_WECHAT || target == Settings.TARGET_BOTH
+        val doRelay = target == Settings.TARGET_RELAY
 
         val tgToken = Settings.getTelegramToken(context)
         val tgChatId = Settings.getTelegramChatId(context)
@@ -41,9 +47,14 @@ object Forwarder {
         val wechatTarget = Settings.getWechatTarget(context)
         val wxReady = ocBaseUrl.isNotBlank() && wechatTarget.isNotBlank()
 
+        val relayUrl = Settings.getRelayUrl(context).trim().trimEnd('/')
+        val relayToken = Settings.getRelayToken(context).trim()
+        val relayReady = relayUrl.isNotBlank() && relayToken.isNotBlank()
+
         // 选中的目标一个都没配好 -> 直接丢弃
-        if ((doTelegram && !tgReady && !doWechat) ||
-            (doWechat && !wxReady && !doTelegram) ||
+        if ((doTelegram && !tgReady && !doWechat && !doRelay) ||
+            (doWechat && !wxReady && !doTelegram && !doRelay) ||
+            (doRelay && !relayReady && !doTelegram && !doWechat) ||
             (doTelegram && doWechat && !tgReady && !wxReady)
         ) return
 
@@ -83,6 +94,23 @@ object Forwarder {
         }
         if (doWechat && wxReady) {
             OpenClaw.send(ocBaseUrl, ocSendPath, ocToken, wechatTarget, text)
+        }
+        if (doRelay && relayReady) {
+            // v3：直连中转只发原文 + AI 备注（如果有），接收端负责展示
+            val id = Relay.send(
+                relayUrl, relayToken, from, body, timestamp,
+                Settings.getDeviceName(context), aiNote
+            )
+            if (id == null) {
+                // 发送失败 -> 进本地 outbox，下次重试
+                RelayOutbox.enqueue(
+                    context, from, body, timestamp,
+                    Settings.getDeviceName(context), aiNote
+                )
+            } else {
+                // 顺手把之前积压的也发出
+                RelayOutbox.drain(context)
+            }
         }
     }
 

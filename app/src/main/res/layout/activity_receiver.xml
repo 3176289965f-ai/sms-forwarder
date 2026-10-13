@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v3 接收端页：中转设置 → 接收服务开关 → 收件箱 -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/contentLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="84dp"
+            android:paddingBottom="16dp">
+
+            <!-- 中转设置 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/glass_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/glass_accent_bar" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="直连中转设置"
+                        android:textColor="@color/glass_text_primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="中转地址（与发送端填同一个）"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etRelayUrl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/glass_input"
+                    android:hint="https://xsmlink.duckdns.org/sms-relay"
+                    android:importantForAutofill="no"
+                    android:inputType="textUri"
+                    android:padding="12dp"
+                    android:singleLine="true"
+                    android:textColor="@color/glass_text_primary"
+                    android:textColorHint="@color/glass_text_hint"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="中转 Token（与发送端填同一串）"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etRelayToken"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/glass_input"
+                    android:hint="EC2 上 relay_token.txt 里的那串"
+                    android:importantForAutofill="no"
+                    android:inputType="textPassword"
+                    android:padding="12dp"
+                    android:singleLine="true"
+                    android:textColor="@color/glass_text_primary"
+                    android:textColorHint="@color/glass_text_hint"
+                    android:textSize="15sp" />
+
+                <Button
+                    android:id="@+id/btnSaveRelay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/glass_btn_primary"
+                    android:padding="12dp"
+                    android:text="保存设置"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnTestRelayRx"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/glass_btn_secondary"
+                    android:padding="12dp"
+                    android:text="测试中转连通性"
+                    android:textColor="@color/glass_text_primary"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <!-- 接收服务 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/glass_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/glass_accent_bar" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="接收服务"
+                        android:textColor="@color/glass_text_primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvServiceState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="服务未运行"
+                    android:textColor="@color/glass_text_primary"
+                    android:textSize="14sp" />
+
+                <Button
+                    android:id="@+id/btnToggleService"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/glass_btn_primary"
+                    android:padding="12dp"
+                    android:text="启动接收服务"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="服务每 10 秒轮询一次中转，有新短信就弹通知。\n保活：设置 → 电池 → 短信转发 → 无限制；允许自启动；锁定后台。\n通知栏会常驻一条「短信转发 · 接收中」，不要划掉。"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <!-- 收件箱 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/glass_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/glass_accent_bar" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:text="收件箱"
+                        android:textColor="@color/glass_text_primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnRefreshInbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/glass_btn_secondary"
+                        android:padding="8dp"
+                        android:text="刷新"
+                        android:textColor="@color/glass_text_primary"
+                        android:textSize="13sp" />
+
+                    <Button
+                        android:id="@+id/btnClearInbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/glass_btn_secondary"
+                        android:padding="8dp"
+                        android:text="清空"
+                        android:textColor="@color/glass_text_secondary"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/llInbox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical" />
+            </LinearLayout>
+
+            <!-- 状态卡 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/glass_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/tvRxStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="状态：等待配置"
+                    android:textColor="@color/glass_text_primary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnSwitchRole"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/glass_btn_secondary"
+                android:padding="12dp"
+                android:text="切换角色…"
+                android:textColor="@color/glass_text_secondary"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- 液态玻璃顶栏 -->
+    <FrameLayout
+        android:id="@+id/liquidHeader"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="12dp">
+
+        <ImageView
+            android:id="@+id/refractionView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/liquid_glass_base"
+            android:scaleType="fitXY" />
+
+        <ImageView
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="18dp"
+            android:alpha="0.9"
+            android:src="@drawable/header_bubbles" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/liquid_tint" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/liquid_sheen" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/liquid_glass_edge" />
+
+    </FrameLayout>
+
+</FrameLayout>

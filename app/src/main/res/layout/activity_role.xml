@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v3 角色选择页 -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/contentLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="84dp"
+            android:paddingBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/glass_card"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="这台手机是？"
+                    android:textColor="@color/glass_text_primary"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvRoleNotice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="v3 改为两台手机直连：备用机收短信 → 经你的 EC2 中转 → 主力机弹通知。不再依赖 Telegram / 微信。"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="14sp" />
+
+                <Button
+                    android:id="@+id/btnRoleSender"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/glass_btn_primary"
+                    android:padding="16dp"
+                    android:text="📲 发送端（收短信的备用机）"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="监听本机短信，上传到你的 EC2 中转。需要短信权限。"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/btnRoleReceiver"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/glass_btn_secondary"
+                    android:padding="16dp"
+                    android:text="🔔 接收端（看通知的主力机）"
+                    android:textColor="@color/glass_text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="轮询 EC2 中转，有新短信就弹通知栏通知。需要通知权限 + 保活设置。"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:text="选错了可以在设置页里切换角色"
+                android:textColor="@color/glass_text_hint"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- 液态玻璃顶栏 -->
+    <FrameLayout
+        android:id="@+id/liquidHeader"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="12dp">
+
+        <ImageView
+            android:id="@+id/refractionView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/liquid_glass_base"
+            android:scaleType="fitXY" />
+
+        <ImageView
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="18dp"
+            android:alpha="0.9"
+            android:src="@drawable/header_bubbles" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/liquid_tint" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/liquid_sheen" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/liquid_glass_edge" />
+
+    </FrameLayout>
+
+</FrameLayout>

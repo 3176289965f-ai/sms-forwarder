@@ -56,32 +56,130 @@
                     android:orientation="vertical">
 
                     <RadioButton
+                        android:id="@+id/rbRelay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="@color/glass_accent"
+                        android:text="直连中转（经你的 EC2，默认）"
+                        android:textColor="@color/glass_text_primary"
+                        android:textSize="15sp" />
+
+                    <RadioButton
                         android:id="@+id/rbTelegram"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="@color/glass_accent"
-                        android:text="Telegram（默认）"
-                        android:textColor="@color/glass_text_primary"
-                        android:textSize="15sp" />
-
-                    <RadioButton
-                        android:id="@+id/rbWechat"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:buttonTint="@color/glass_accent"
-                        android:text="微信 ClawBot（经由 OpenClaw 网关）"
-                        android:textColor="@color/glass_text_primary"
-                        android:textSize="15sp" />
-
-                    <RadioButton
-                        android:id="@+id/rbBoth"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:buttonTint="@color/glass_accent"
-                        android:text="两者都发"
+                        android:text="Telegram"
                         android:textColor="@color/glass_text_primary"
                         android:textSize="15sp" />
                 </RadioGroup>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="微信 ClawBot 通道已折叠停用（iLink 限制），配置保留在下方，可展开查看。"
+                    android:textColor="@color/glass_text_hint"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <!-- 直连中转设置（v3） -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/glass_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/glass_accent_bar" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="直连中转设置"
+                        android:textColor="@color/glass_text_primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="中转地址（EC2 上 relay 服务的公网地址）"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etRelayUrl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/glass_input"
+                    android:hint="https://xsmlink.duckdns.org/sms-relay"
+                    android:importantForAutofill="no"
+                    android:inputType="textUri"
+                    android:padding="12dp"
+                    android:singleLine="true"
+                    android:textColor="@color/glass_text_primary"
+                    android:textColorHint="@color/glass_text_hint"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="中转 Token（EC2 上 relay_token.txt 里的那串）"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etRelayToken"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/glass_input"
+                    android:hint="与接收端填同一串"
+                    android:importantForAutofill="no"
+                    android:inputType="textPassword"
+                    android:padding="12dp"
+                    android:singleLine="true"
+                    android:textColor="@color/glass_text_primary"
+                    android:textColorHint="@color/glass_text_hint"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="本机名称（接收端用来区分多台发送机）"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etDeviceName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/glass_input"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:padding="12dp"
+                    android:singleLine="true"
+                    android:textColor="@color/glass_text_primary"
+                    android:textColorHint="@color/glass_text_hint"
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <!-- Telegram 设置 -->
@@ -160,7 +258,7 @@
                     android:textSize="15sp" />
             </LinearLayout>
 
-            <!-- 微信 ClawBot 设置 -->
+            <!-- 微信 ClawBot 设置（v3：折叠隐藏，灰度保留） -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -169,124 +267,125 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
+                <Button
+                    android:id="@+id/btnWechatExpand"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:background="@drawable/glass_btn_secondary"
+                    android:padding="10dp"
+                    android:text="微信 ClawBot 设置（已暂停，点击展开查看）"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="14sp" />
 
-                    <View
-                        android:layout_width="4dp"
-                        android:layout_height="20dp"
-                        android:background="@drawable/glass_accent_bar" />
+                <LinearLayout
+                    android:id="@+id/wechatCollapsed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="⚠️ 该通道因 iLink 限制暂时不可用（机器人主动发送被拒），配置原样保留，限制解除后可恢复启用。"
+                        android:textColor="@color/glass_text_secondary"
+                        android:textSize="13sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="微信 ClawBot 设置"
+                        android:layout_marginTop="10dp"
+                        android:text="OpenClaw 网关地址"
+                        android:textColor="@color/glass_text_secondary"
+                        android:textSize="14sp" />
+
+                    <EditText
+                        android:id="@+id/etOcBaseUrl"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:background="@drawable/glass_input"
+                        android:enabled="false"
+                        android:hint="例如 http://192.168.1.10:18789"
+                        android:importantForAutofill="no"
+                        android:inputType="textUri"
+                        android:padding="12dp"
+                        android:singleLine="true"
                         android:textColor="@color/glass_text_primary"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
+                        android:textColorHint="@color/glass_text_hint"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="网关 API Token"
+                        android:textColor="@color/glass_text_secondary"
+                        android:textSize="14sp" />
+
+                    <EditText
+                        android:id="@+id/etOcToken"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:background="@drawable/glass_input"
+                        android:enabled="false"
+                        android:hint="OpenClaw 配置里的 gateway token"
+                        android:importantForAutofill="no"
+                        android:inputType="textPassword"
+                        android:padding="12dp"
+                        android:singleLine="true"
+                        android:textColor="@color/glass_text_primary"
+                        android:textColorHint="@color/glass_text_hint"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="微信目标 ID"
+                        android:textColor="@color/glass_text_secondary"
+                        android:textSize="14sp" />
+
+                    <EditText
+                        android:id="@+id/etWechatTarget"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:background="@drawable/glass_input"
+                        android:enabled="false"
+                        android:hint="openclaw message channel list 查得的目标 ID"
+                        android:inputType="text"
+                        android:padding="12dp"
+                        android:singleLine="true"
+                        android:textColor="@color/glass_text_primary"
+                        android:textColorHint="@color/glass_text_hint"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="发送路径（高级，一般不用改）"
+                        android:textColor="@color/glass_text_secondary"
+                        android:textSize="14sp" />
+
+                    <EditText
+                        android:id="@+id/etOcSendPath"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:background="@drawable/glass_input"
+                        android:enabled="false"
+                        android:hint="/rpc"
+                        android:inputType="text"
+                        android:padding="12dp"
+                        android:singleLine="true"
+                        android:textColor="@color/glass_text_primary"
+                        android:textColorHint="@color/glass_text_hint"
+                        android:textSize="15sp" />
                 </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="先在电脑/服务器上装好 OpenClaw 网关并登录微信：\n① npx -y @tencent-weixin/openclaw-weixin-cli@latest install\n② openclaw channels login --channel openclaw-weixin（微信扫码）\n③ 用 openclaw message channel list 查目标 ID\n④ 保证手机能访问网关地址（同一 Wi-Fi 填内网 IP）"
-                    android:textColor="@color/glass_text_secondary"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="OpenClaw 网关地址"
-                    android:textColor="@color/glass_text_secondary"
-                    android:textSize="14sp" />
-
-                <EditText
-                    android:id="@+id/etOcBaseUrl"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:background="@drawable/glass_input"
-                    android:hint="例如 http://192.168.1.10:18789"
-                    android:importantForAutofill="no"
-                    android:inputType="textUri"
-                    android:padding="12dp"
-                    android:singleLine="true"
-                    android:textColor="@color/glass_text_primary"
-                    android:textColorHint="@color/glass_text_hint"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="网关 API Token"
-                    android:textColor="@color/glass_text_secondary"
-                    android:textSize="14sp" />
-
-                <EditText
-                    android:id="@+id/etOcToken"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:background="@drawable/glass_input"
-                    android:hint="OpenClaw 配置里的 gateway token"
-                    android:importantForAutofill="no"
-                    android:inputType="textPassword"
-                    android:padding="12dp"
-                    android:singleLine="true"
-                    android:textColor="@color/glass_text_primary"
-                    android:textColorHint="@color/glass_text_hint"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="微信目标 ID"
-                    android:textColor="@color/glass_text_secondary"
-                    android:textSize="14sp" />
-
-                <EditText
-                    android:id="@+id/etWechatTarget"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:background="@drawable/glass_input"
-                    android:hint="openclaw message channel list 查得的目标 ID"
-                    android:inputType="text"
-                    android:padding="12dp"
-                    android:singleLine="true"
-                    android:textColor="@color/glass_text_primary"
-                    android:textColorHint="@color/glass_text_hint"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="发送路径（高级，一般不用改）"
-                    android:textColor="@color/glass_text_secondary"
-                    android:textSize="14sp" />
-
-                <EditText
-                    android:id="@+id/etOcSendPath"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:background="@drawable/glass_input"
-                    android:hint="/rpc"
-                    android:inputType="text"
-                    android:padding="12dp"
-                    android:singleLine="true"
-                    android:textColor="@color/glass_text_primary"
-                    android:textColorHint="@color/glass_text_hint"
-                    android:textSize="15sp" />
             </LinearLayout>
 
             <!-- Hachimi AI -->
@@ -452,7 +551,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="设置 → 电池 → 短信转发 → 无限制 / 允许后台活动；允许自启动；把 App 锁定在多任务后台。\n微信通道还要求 OpenClaw 网关设备长期在线。"
+                    android:text="设置 → 电池 → 短信转发 → 无限制 / 允许后台活动；允许自启动；把 App 锁定在多任务后台。\n直连中转要求手机能访问中转地址（EC2 公网地址，Wi-Fi / 流量均可）。"
                     android:textColor="@color/glass_text_secondary"
                     android:textSize="13sp" />
             </LinearLayout>
@@ -471,6 +570,17 @@
                 android:textStyle="bold" />
 
             <Button
+                android:id="@+id/btnTestRelay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/glass_btn_secondary"
+                android:padding="12dp"
+                android:text="测试直连中转"
+                android:textColor="@color/glass_text_primary"
+                android:textSize="15sp" />
+
+            <Button
                 android:id="@+id/btnTestTelegram"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -478,17 +588,6 @@
                 android:background="@drawable/glass_btn_secondary"
                 android:padding="12dp"
                 android:text="测试 Telegram 转发"
-                android:textColor="@color/glass_text_primary"
-                android:textSize="15sp" />
-
-            <Button
-                android:id="@+id/btnTestWechat"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/glass_btn_secondary"
-                android:padding="12dp"
-                android:text="测试微信 ClawBot 转发"
                 android:textColor="@color/glass_text_primary"
                 android:textSize="15sp" />
 
@@ -502,6 +601,17 @@
                 android:text="测试 Hachimi 连通性"
                 android:textColor="@color/glass_text_primary"
                 android:textSize="15sp" />
+
+            <Button
+                android:id="@+id/btnSwitchRole"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/glass_btn_secondary"
+                android:padding="12dp"
+                android:text="切换角色…"
+                android:textColor="@color/glass_text_secondary"
+                android:textSize="14sp" />
 
             <!-- 状态卡 -->
             <LinearLayout

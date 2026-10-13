@@ -19,3 +19,7 @@ build-manual/
 # Build outputs
 *.apk
 *.zip
+
+# manual pipelines
+build-release/
+build-v3/

@@ -4,6 +4,11 @@
 
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- v3 接收端 -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
 
     <application
@@ -13,6 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/Theme.SmsForwarder">
 
+        <!-- v3 入口：角色路由 -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -22,12 +28,35 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".SenderActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ReceiverActivity"
+            android:exported="false" />
+
         <receiver
             android:name=".SmsReceiver"
             android:exported="true"
             android:permission="android.permission.BROADCAST_SMS">
             <intent-filter android:priority="999">
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- v3 接收端：轮询中转的前台服务 -->
+        <service
+            android:name=".RelayService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+        <!-- v3 接收端：开机自动恢复接收服务 -->
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
