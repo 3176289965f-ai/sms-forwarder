@@ -131,7 +131,7 @@ class RelayService : Service() {
             @Suppress("DEPRECATION")
             Notification.Builder(this)
         }
-        return b.setContentTitle("短信转发 · 接收中")
+        return b.setContentTitle("短信转发 · 短信接收中")
             .setContentText(text)
             .setSmallIcon(android.R.drawable.stat_notify_sync)
             .setContentIntent(openAppIntent())
