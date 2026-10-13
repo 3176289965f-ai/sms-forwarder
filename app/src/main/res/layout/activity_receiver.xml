@@ -313,13 +313,6 @@
             android:layout_height="match_parent"
             android:background="@drawable/liquid_glass_edge" />
 
-        <!-- 水波纹层：最上层，只画波浪不吃点击 -->
-        <com.example.smsforward.WaveRippleView
-            android:id="@+id/waveRipple"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
-
     </FrameLayout>
 
     <!-- 保活设置侧边栏：遮罩 + 左滑面板 -->

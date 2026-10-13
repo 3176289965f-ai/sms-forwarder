@@ -143,17 +143,9 @@ class ReceiverActivity : Activity() {
         drawerPanel.post { drawerPanel.translationX = -drawerPanel.width.toFloat() }
         drawerScrim.setOnClickListener { setDrawer(false) }
 
-        // ---- 左上角气泡：打开侧边栏，顶栏泛水波纹（气泡本身不做任何视觉修改） ----
+        // ---- 左上角气泡：打开保活设置侧边栏（气泡本身不做任何视觉修改） ----
         val bubble = findViewById<ImageView>(R.id.headerBubble)
-        val wave = findViewById<WaveRippleView>(R.id.waveRipple)
-        bubble.setOnClickListener {
-            // 以气泡中心为圆心，在液态玻璃上荡开水波纹
-            val cx = bubble.left + bubble.width / 2f
-            val cy = bubble.top + bubble.height / 2f
-            wave.startRipple(cx, cy)
-            // 稍晚一点再滑出侧边栏，让波浪先泛开（否则抽屉立刻盖住顶栏）
-            bubble.postDelayed({ setDrawer(true) }, 380)
-        }
+        bubble.setOnClickListener { setDrawer(true) }
 
         LiquidHeader.attach(this)
     }
