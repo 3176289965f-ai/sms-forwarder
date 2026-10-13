@@ -20,11 +20,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/Theme.SmsForwarder">
 
-        <!-- v3 入口：角色路由（GKD 式：不进多任务列表，防手滑划掉） -->
+        <!-- v3 入口：角色路由（后台隐藏改为运行时开关，见 Settings.applyHideFromRecents） -->
         <activity
             android:name=".MainActivity"
-            android:exported="true"
-            android:excludeFromRecents="true">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -33,13 +32,11 @@
 
         <activity
             android:name=".SenderActivity"
-            android:exported="false"
-            android:excludeFromRecents="true" />
+            android:exported="false" />
 
         <activity
             android:name=".ReceiverActivity"
-            android:exported="false"
-            android:excludeFromRecents="true" />
+            android:exported="false" />
 
         <receiver
             android:name=".SmsReceiver"

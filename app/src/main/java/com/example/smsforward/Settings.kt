@@ -1,6 +1,9 @@
 package com.example.smsforward
 
+import android.app.Activity
+import android.app.ActivityManager
 import android.content.Context
+import android.os.Build
 
 /**
  * App 配置。Token / Key 只存放在本机私有目录，不会上传到任何地方。
@@ -133,6 +136,31 @@ object Settings {
 
     fun setReceiverRunning(c: Context, v: Boolean) {
         prefs(c).edit().putBoolean("receiver_running", v).apply()
+    }
+
+    // ---- v3：后台隐藏（GKD 式开关：在「最近任务」隐藏卡片，防手滑划掉）----
+
+    /** 默认开启：跟 GKD 的「后台隐藏」开关同款行为 */
+    fun isHideFromRecents(c: Context): Boolean =
+        prefs(c).getBoolean("hide_recents", true)
+
+    fun setHideFromRecents(c: Context, v: Boolean) {
+        prefs(c).edit().putBoolean("hide_recents", v).apply()
+    }
+
+    /**
+     * 运行时动态控制当前任务是否出现在「最近任务」里
+     *（manifest 写死就做不成开关了，所以用 AppTask.setExcludeFromRecents）。
+     * 每个 Activity 的 onCreate 里调一次即可。
+     */
+    fun applyHideFromRecents(activity: Activity) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return
+        try {
+            val am = activity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val hide = isHideFromRecents(activity)
+            am.appTasks.forEach { it.setExcludeFromRecents(hide) }
+        } catch (_: Exception) {
+        }
     }
 
     /**

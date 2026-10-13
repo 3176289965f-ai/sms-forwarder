@@ -35,6 +35,7 @@ class MainActivity : Activity() {
         }
 
         setContentView(R.layout.activity_role)
+        Settings.applyHideFromRecents(this)
         if (migrated) {
             findViewById<TextView>(R.id.tvRoleNotice).text =
                 "ℹ️ v3 更新：微信 ClawBot 通道已折叠停用（iLink 限制），" +

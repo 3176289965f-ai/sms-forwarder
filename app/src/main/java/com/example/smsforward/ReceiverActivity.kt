@@ -11,6 +11,7 @@ import android.view.Gravity
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.Switch
 import android.widget.TextView
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -30,6 +31,7 @@ class ReceiverActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_receiver)
+        Settings.applyHideFromRecents(this)
 
         val etRelayUrl = findViewById<EditText>(R.id.etRelayUrl)
         val etRelayToken = findViewById<EditText>(R.id.etRelayToken)
@@ -110,6 +112,13 @@ class ReceiverActivity : Activity() {
         }
 
         btnBatteryWhitelist.setOnClickListener { requestBatteryWhitelist() }
+
+        val swHideRecents = findViewById<Switch>(R.id.swHideRecents)
+        swHideRecents.isChecked = Settings.isHideFromRecents(this)
+        swHideRecents.setOnCheckedChangeListener { _, checked ->
+            Settings.setHideFromRecents(this, checked)
+            Settings.applyHideFromRecents(this)
+        }
 
         LiquidHeader.attach(this)
     }

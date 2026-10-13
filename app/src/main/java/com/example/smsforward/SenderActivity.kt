@@ -25,6 +25,7 @@ class SenderActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sender)
+        Settings.applyHideFromRecents(this)
 
         val rgTarget = findViewById<RadioGroup>(R.id.rgTarget)
         val rbRelay = findViewById<RadioButton>(R.id.rbRelay)
@@ -188,6 +189,13 @@ class SenderActivity : Activity() {
                     tvStatus.text = "无法自动打开，请手动前往：设置 → 电池 → 短信转发 → 无限制"
                 }
             }
+        }
+
+        val swHideRecents = findViewById<Switch>(R.id.swHideRecents)
+        swHideRecents.isChecked = Settings.isHideFromRecents(this)
+        swHideRecents.setOnCheckedChangeListener { _, checked ->
+            Settings.setHideFromRecents(this, checked)
+            Settings.applyHideFromRecents(this)
         }
 
         LiquidHeader.attach(this)
