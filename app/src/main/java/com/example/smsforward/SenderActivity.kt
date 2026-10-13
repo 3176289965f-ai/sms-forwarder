@@ -50,6 +50,7 @@ class SenderActivity : Activity() {
         val btnWechatExpand = findViewById<Button>(R.id.btnWechatExpand)
         val wechatCollapsed = findViewById<LinearLayout>(R.id.wechatCollapsed)
         val btnSwitchRole = findViewById<Button>(R.id.btnSwitchRole)
+        val btnBatteryWhitelist = findViewById<Button>(R.id.btnBatteryWhitelist)
 
         // 读取已保存的配置
         when (Settings.getForwardTarget(this)) {
@@ -170,6 +171,23 @@ class SenderActivity : Activity() {
             Settings.setRole(this, Settings.ROLE_UNSET)
             startActivity(Intent(this, MainActivity::class.java))
             finish()
+        }
+
+        btnBatteryWhitelist.setOnClickListener {
+            try {
+                val intent = Intent(
+                    android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+                ).apply { data = android.net.Uri.parse("package:$packageName") }
+                startActivity(intent)
+            } catch (e: Exception) {
+                try {
+                    startActivity(
+                        Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+                    )
+                } catch (e2: Exception) {
+                    tvStatus.text = "无法自动打开，请手动前往：设置 → 电池 → 短信转发 → 无限制"
+                }
+            }
         }
 
         LiquidHeader.attach(this)

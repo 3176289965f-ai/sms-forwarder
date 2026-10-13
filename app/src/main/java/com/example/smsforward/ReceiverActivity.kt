@@ -42,6 +42,7 @@ class ReceiverActivity : Activity() {
         val btnRefreshInbox = findViewById<Button>(R.id.btnRefreshInbox)
         val btnClearInbox = findViewById<Button>(R.id.btnClearInbox)
         val btnSwitchRole = findViewById<Button>(R.id.btnSwitchRole)
+        val btnBatteryWhitelist = findViewById<Button>(R.id.btnBatteryWhitelist)
 
         etRelayUrl.setText(Settings.getRelayUrl(this))
         etRelayToken.setText(Settings.getRelayToken(this))
@@ -108,6 +109,8 @@ class ReceiverActivity : Activity() {
             finish()
         }
 
+        btnBatteryWhitelist.setOnClickListener { requestBatteryWhitelist() }
+
         LiquidHeader.attach(this)
     }
 
@@ -122,6 +125,27 @@ class ReceiverActivity : Activity() {
         @Suppress("DEPRECATION")
         return am.getRunningServices(Int.MAX_VALUE)
             .any { it.service.className == RelayService::class.java.name }
+    }
+
+    /**
+     * 一键跳转电池优化白名单（注意：本文件的 Settings 是 App 自己的配置类，
+     * 这里必须用全限定的 android.provider.Settings）。
+     */
+    private fun requestBatteryWhitelist() {
+        try {
+            val intent = Intent(
+                android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+            ).apply { data = android.net.Uri.parse("package:$packageName") }
+            startActivity(intent)
+        } catch (e: Exception) {
+            try {
+                startActivity(
+                    Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+                )
+            } catch (e2: Exception) {
+                tvRxStatus.text = "无法自动打开，请手动前往：设置 → 电池 → 短信转发 → 无限制"
+            }
+        }
     }
 
     private fun refreshServiceState() {

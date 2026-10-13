@@ -554,6 +554,17 @@
                     android:text="设置 → 电池 → 短信转发 → 无限制 / 允许后台活动；允许自启动；把 App 锁定在多任务后台。\n直连中转要求手机能访问中转地址（EC2 公网地址，Wi-Fi / 流量均可）。"
                     android:textColor="@color/glass_text_secondary"
                     android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/btnBatteryWhitelist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/glass_btn_secondary"
+                    android:padding="10dp"
+                    android:text="加入电池优化白名单（一键）"
+                    android:textColor="@color/glass_text_primary"
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <!-- 操作按钮 -->

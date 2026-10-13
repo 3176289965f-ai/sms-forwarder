@@ -176,6 +176,17 @@
                     android:text="服务每 10 秒轮询一次中转，有新短信就弹通知。\n保活：设置 → 电池 → 短信转发 → 无限制；允许自启动；锁定后台。\n通知栏会常驻一条「短信转发 · 接收中」，不要划掉。"
                     android:textColor="@color/glass_text_secondary"
                     android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/btnBatteryWhitelist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/glass_btn_secondary"
+                    android:padding="12dp"
+                    android:text="加入电池优化白名单（一键）"
+                    android:textColor="@color/glass_text_primary"
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <!-- 收件箱 -->
