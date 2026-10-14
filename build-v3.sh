@@ -11,8 +11,8 @@ BT=$SDK/build-tools/34.0.0
 AJAR=$SDK/platforms/android-34/android.jar
 KC=$SDK/kotlin-compiler-2.0.20/kotlinc
 OUT=$PROJ/build-v3
-VCODE=4
-VNAME="3.1"
+VCODE=5
+VNAME="4.0"
 KEYSTORE=~/workspace/sms-forwarder-v2/debug.keystore
 
 rm -rf "$OUT"; mkdir -p "$OUT/gen" "$OUT/classes" "$OUT/dex"
