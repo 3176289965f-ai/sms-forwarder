@@ -62,6 +62,9 @@ object Reconciler {
                 PackageManager.PERMISSION_GRANTED
             ) return
 
+            // 记一笔：这次扫描的时间，底部小字展示用
+            Settings.setLastScanTime(context, System.currentTimeMillis())
+
             var watermark = Settings.getReconcileWatermark(context)
             if (watermark == 0L) {
                 // 首次对账：水位设为现在，只捞以后的短信，不翻旧账

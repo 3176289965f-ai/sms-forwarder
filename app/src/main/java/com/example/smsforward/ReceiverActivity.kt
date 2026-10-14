@@ -21,7 +21,7 @@ import java.util.Locale
 
 /**
  * v3 接收端页（装在看通知的主力机上）：
- * 中转设置 → 接收服务开关 → 收件箱。
+ * 中转设置 → 接收服务开关 → 已收记录。
  */
 class ReceiverActivity : Activity() {
 
@@ -102,7 +102,7 @@ class ReceiverActivity : Activity() {
         btnClearInbox.setOnClickListener {
             InboxStore.clear(this)
             renderInbox()
-            tvRxStatus.text = "收件箱已清空（不影响中转队列）"
+            tvRxStatus.text = "已收记录已清空（不影响中转队列）"
         }
 
         btnSwitchRole.setOnClickListener {

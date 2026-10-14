@@ -18,7 +18,7 @@ import android.widget.TextView
 /**
  * v3 发送端配置页（装在收短信的备用机上）：
  * 转发目标（直连中转 / Telegram）→ 直连中转设置（点击展开）→ Telegram 设置（点击展开）→
- * 微信 ClawBot（折叠隐藏，灰度保留）→ Hachimi AI 预处理（点击展开）→ 关键词过滤 → 发送记录。
+ * 微信 ClawBot（折叠隐藏，灰度保留）→ Hachimi AI 预处理（点击展开）→ 关键词过滤 → 已发送/已补发/已屏蔽记录。
  * 保活设置 + 测试连通性收进左侧折叠栏（顶栏左上角气泡打开，点测试会自动收起折叠栏）。
  * 三个点击展开卡片：已配好之后默认收起（页面清爽），首次未配完的才默认展开。
  * 网络操作都在后台线程，主线程只更新 UI。
@@ -239,13 +239,22 @@ class SenderActivity : Activity() {
             Settings.applyHideFromRecents(this)
         }
 
-        // ---- 发送记录 ----
-        findViewById<Button>(R.id.btnLogRefresh).setOnClickListener { refreshSendLog() }
+        // ---- 记录卡：已发送 / 已补发 / 已屏蔽 ----
+        findViewById<Button>(R.id.btnSentRefresh).setOnClickListener {
+            renderLogCard(R.id.llSentLog, SENT_KINDS)
+        }
+        findViewById<Button>(R.id.btnResendRefresh).setOnClickListener {
+            renderLogCard(R.id.llResendLog, RESEND_KINDS)
+        }
+        findViewById<Button>(R.id.btnBlockedRefresh).setOnClickListener {
+            renderLogCard(R.id.llBlockedLog, BLOCKED_KINDS)
+        }
         findViewById<Button>(R.id.btnLogClear).setOnClickListener {
             SendLog.clear(this)
-            refreshSendLog()
+            refreshAllLogCards()
         }
-        refreshSendLog()
+        refreshAllLogCards()
+        updateLastScan()
 
         // ---- v3.1 对账补发开关 ----
         val swReconcile = findViewById<Switch>(R.id.swReconcile)
@@ -351,11 +360,30 @@ class SenderActivity : Activity() {
         }
     }
 
-    /** 刷新发送记录列表（最新 20 条） */
-    private fun refreshSendLog() {
-        val ll = findViewById<LinearLayout>(R.id.llSendLog)
+    override fun onResume() {
+        super.onResume()
+        refreshAllLogCards()
+        updateLastScan()
+    }
+
+    companion object {
+        private val SENT_KINDS = setOf("已发送", "未发送", "已入队")
+        private val RESEND_KINDS = setOf("补发")
+        private val BLOCKED_KINDS = setOf("已过滤")
+    }
+
+    /** 刷新三张记录卡 */
+    private fun refreshAllLogCards() {
+        renderLogCard(R.id.llSentLog, SENT_KINDS)
+        renderLogCard(R.id.llResendLog, RESEND_KINDS)
+        renderLogCard(R.id.llBlockedLog, BLOCKED_KINDS)
+    }
+
+    /** 渲染一张记录卡（指定类型，最新 20 条） */
+    private fun renderLogCard(containerId: Int, kinds: Set<String>) {
+        val ll = findViewById<LinearLayout>(containerId)
         ll.removeAllViews()
-        val events = SendLog.list(this).take(20)
+        val events = SendLog.list(this).filter { it.kind in kinds }.take(20)
         if (events.isEmpty()) {
             val tv = TextView(this)
             tv.text = "暂无记录"
@@ -379,6 +407,20 @@ class SenderActivity : Activity() {
             tv.textSize = 13f
             tv.setPadding(0, 8, 0, 8)
             ll.addView(tv)
+        }
+    }
+
+    /** 底部序列号小字：上次扫描短信库时间 */
+    private fun updateLastScan() {
+        val tv = findViewById<TextView>(R.id.tvLastScan) ?: return
+        val t = Settings.getLastScanTime(this)
+        tv.text = if (t == 0L) {
+            "上次扫描短信库 --"
+        } else {
+            val sdf = java.text.SimpleDateFormat(
+                "yyyy-MM-dd HH:mm", java.util.Locale.getDefault()
+            )
+            "上次扫描短信库 ${sdf.format(java.util.Date(t))}"
         }
     }
 }

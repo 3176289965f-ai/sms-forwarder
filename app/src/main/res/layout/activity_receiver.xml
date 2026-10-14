@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- v3 接收端页：中转设置 → 接收服务开关 → 收件箱 -->
+<!-- v3 接收端页：中转设置 → 接收服务开关 → 已收记录 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -178,7 +178,7 @@
                     android:textSize="13sp" />
             </LinearLayout>
 
-            <!-- 收件箱 -->
+            <!-- 已收记录 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -203,7 +203,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:text="收件箱"
+                        android:text="已收记录"
                         android:textColor="@color/glass_text_primary"
                         android:textSize="17sp"
                         android:textStyle="bold" />

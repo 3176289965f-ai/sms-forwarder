@@ -240,4 +240,12 @@ object Settings {
     fun setReconcileWatermark(c: Context, v: Long) {
         prefs(c).edit().putLong("reconcile_watermark", v).apply()
     }
+
+    /** 上次扫描短信库的时间（毫秒）。0 表示从未扫描过。底部序列号小字展示用。 */
+    fun getLastScanTime(c: Context): Long =
+        prefs(c).getLong("last_scan_time", 0L)
+
+    fun setLastScanTime(c: Context, v: Long) {
+        prefs(c).edit().putLong("last_scan_time", v).apply()
+    }
 }
