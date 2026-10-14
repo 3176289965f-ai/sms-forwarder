@@ -233,15 +233,33 @@ object RelayOutbox {
     private fun readAll(context: Context): List<JSONObject> {
         val f = file(context)
         if (!f.exists()) return emptyList()
-        val arr = JSONArray(f.readText(Charsets.UTF_8))
-        return buildList {
-            for (i in 0 until arr.length()) add(arr.getJSONObject(i))
+        return try {
+            val arr = JSONArray(f.readText(Charsets.UTF_8))
+            buildList {
+                for (i in 0 until arr.length()) add(arr.getJSONObject(i))
+            }
+        } catch (e: Exception) {
+            // 文件损坏（比如写一半被杀进程）：备份坏文件后视为空，
+            // 否则之后每次 drain/enqueue 读到它都会崩，积压永远发不出去。
+            try {
+                f.renameTo(File(context.filesDir, "$FILE.bak.${System.currentTimeMillis()}"))
+            } catch (_: Exception) {
+            }
+            e.printStackTrace()
+            emptyList()
         }
     }
 
     private fun writeAll(context: Context, list: List<JSONObject>) {
         val arr = JSONArray()
         list.forEach { arr.put(it) }
-        file(context).writeText(arr.toString(), Charsets.UTF_8)
+        // 原子写入：先写临时文件再改名，避免写一半被杀导致文件损坏
+        try {
+            val tmp = File(context.filesDir, "$FILE.tmp")
+            tmp.writeText(arr.toString(), Charsets.UTF_8)
+            tmp.renameTo(file(context))
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }

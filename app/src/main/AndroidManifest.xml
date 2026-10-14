@@ -3,6 +3,8 @@
     package="com.example.smsforward">
 
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <!-- v3.1 对账补发：发送端每 10 分钟扫短信库捞回漏转 -->
+    <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- v3 接收端 -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -61,6 +63,11 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <!-- v3.1 发送端：对账闹钟（AlarmManager 显式广播，无需 intent-filter） -->
+        <receiver
+            android:name=".ReconcileReceiver"
+            android:exported="false" />
 
     </application>
 </manifest>

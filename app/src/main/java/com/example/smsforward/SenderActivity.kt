@@ -75,9 +75,17 @@ class SenderActivity : Activity() {
 
         // 首次打开申请短信权限
         if (checkSelfPermission(Manifest.permission.RECEIVE_SMS) !=
+            PackageManager.PERMISSION_GRANTED ||
+            checkSelfPermission(Manifest.permission.READ_SMS) !=
             PackageManager.PERMISSION_GRANTED
         ) {
-            requestPermissions(arrayOf(Manifest.permission.RECEIVE_SMS), 100)
+            requestPermissions(
+                arrayOf(Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS),
+                100
+            )
+        } else if (Settings.isReconcileEnabled(this)) {
+            // 权限齐了且对账开关开着：确保闹钟在跑
+            Reconciler.scheduleNext(this)
         }
 
         // 断网积压重试
@@ -198,6 +206,92 @@ class SenderActivity : Activity() {
             Settings.applyHideFromRecents(this)
         }
 
+        // ---- 发送记录 ----
+        findViewById<Button>(R.id.btnLogRefresh).setOnClickListener { refreshSendLog() }
+        findViewById<Button>(R.id.btnLogClear).setOnClickListener {
+            SendLog.clear(this)
+            refreshSendLog()
+        }
+        refreshSendLog()
+
+        // ---- v3.1 对账补发开关 ----
+        val swReconcile = findViewById<Switch>(R.id.swReconcile)
+        swReconcile.isChecked = Settings.isReconcileEnabled(this)
+        swReconcile.setOnCheckedChangeListener { _, checked ->
+            Settings.setReconcileEnabled(this, checked)
+            if (checked) {
+                if (checkSelfPermission(Manifest.permission.READ_SMS) ==
+                    PackageManager.PERMISSION_GRANTED
+                ) {
+                    // 首次开启：水位设为现在，不翻旧账
+                    if (Settings.getReconcileWatermark(this) == 0L) {
+                        Settings.setReconcileWatermark(this, System.currentTimeMillis())
+                    }
+                    Reconciler.scheduleNext(this)
+                } else {
+                    requestPermissions(arrayOf(Manifest.permission.READ_SMS), 101)
+                }
+            } else {
+                Reconciler.cancel(this)
+            }
+        }
+
         LiquidHeader.attach(this)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode != 100 && requestCode != 101) return
+        val idx = permissions.indexOf(Manifest.permission.READ_SMS)
+        val granted = idx >= 0 && grantResults.getOrNull(idx) == PackageManager.PERMISSION_GRANTED
+        if (granted) {
+            if (Settings.isReconcileEnabled(this)) {
+                if (Settings.getReconcileWatermark(this) == 0L) {
+                    Settings.setReconcileWatermark(this, System.currentTimeMillis())
+                }
+                Reconciler.scheduleNext(this)
+            }
+        } else {
+            // 拒绝了读取短信权限：对账无法工作，自动关闭开关
+            Settings.setReconcileEnabled(this, false)
+            findViewById<Switch>(R.id.swReconcile)?.isChecked = false
+            findViewById<TextView>(R.id.tvStatus)?.text =
+                "⚠️ 未授予「读取短信」权限，对账补发已关闭"
+        }
+    }
+
+    /** 刷新发送记录列表（最新 20 条） */
+    private fun refreshSendLog() {
+        val ll = findViewById<LinearLayout>(R.id.llSendLog)
+        ll.removeAllViews()
+        val events = SendLog.list(this).take(20)
+        if (events.isEmpty()) {
+            val tv = TextView(this)
+            tv.text = "暂无记录"
+            tv.setTextColor(resources.getColor(R.color.glass_text_hint, theme))
+            tv.textSize = 13f
+            tv.setPadding(0, 8, 0, 8)
+            ll.addView(tv)
+            return
+        }
+        val sdf = java.text.SimpleDateFormat("MM-dd HH:mm", java.util.Locale.getDefault())
+        for (e in events) {
+            val tv = TextView(this)
+            val colorRes = when (e.kind) {
+                "已发送" -> R.color.glass_accent
+                "已过滤", "未发送" -> android.R.color.holo_red_dark
+                "已入队", "补发" -> android.R.color.holo_orange_dark
+                else -> R.color.glass_text_secondary
+            }
+            tv.text = "${sdf.format(java.util.Date(e.time))} · ${e.kind} · ${e.detail}"
+            tv.setTextColor(resources.getColor(colorRes, theme))
+            tv.textSize = 13f
+            tv.setPadding(0, 8, 0, 8)
+            ll.addView(tv)
+        }
     }
 }

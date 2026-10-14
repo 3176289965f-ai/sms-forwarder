@@ -11,6 +11,12 @@ import android.os.Build
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
+        // v3.1 发送端：重启后恢复对账闹钟
+        if (Settings.getRole(context) == Settings.ROLE_SENDER &&
+            Settings.isReconcileEnabled(context)
+        ) {
+            Reconciler.scheduleNext(context)
+        }
         if (Settings.getRole(context) != Settings.ROLE_RECEIVER) return
         if (!Settings.isReceiverRunning(context)) return
         val svc = Intent(context, RelayService::class.java).setAction(RelayService.ACTION_START)

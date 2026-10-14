@@ -222,4 +222,22 @@ object Settings {
         getKeywords(c).split("[,，、]".toRegex())
             .map { it.trim() }
             .filter { it.isNotEmpty() }
+
+    // ---- v3.1：对账补发（发送端每 10 分钟扫一遍短信库，捞回漏转的短信）----
+
+    /** 默认开启：漏转兜底 */
+    fun isReconcileEnabled(c: Context): Boolean =
+        prefs(c).getBoolean("reconcile_enabled", true)
+
+    fun setReconcileEnabled(c: Context, v: Boolean) {
+        prefs(c).edit().putBoolean("reconcile_enabled", v).apply()
+    }
+
+    /** 对账水位：已扫描到的最大短信 date（毫秒）。0 表示从未对账过。 */
+    fun getReconcileWatermark(c: Context): Long =
+        prefs(c).getLong("reconcile_watermark", 0L)
+
+    fun setReconcileWatermark(c: Context, v: Long) {
+        prefs(c).edit().putLong("reconcile_watermark", v).apply()
+    }
 }

@@ -26,11 +26,21 @@ object Forwarder {
 
     data class AiResult(val forward: Boolean, val type: String, val summary: String)
 
-    fun handleSms(context: Context, from: String, body: String, timestamp: Long) {
+    /**
+     * 统一的短信处理入口：广播收到短信、对账扫到短信都走这里。
+     *
+     * @param isReconcile true=对账补发路径（广播没送达时捞回），只影响日志标注
+     */
+    fun handleSms(context: Context, from: String, body: String, timestamp: Long, isReconcile: Boolean = false) {
         // v3：只有发送端才处理短信
         if (Settings.getRole(context) != Settings.ROLE_SENDER &&
             Settings.getRole(context) != Settings.ROLE_UNSET
         ) return
+
+        // 去重：广播和对账可能撞到同一条短信，只处理一次
+        val dedupKey = "$from|$timestamp"
+        if (ForwardedStore.isDone(context, dedupKey)) return
+        ForwardedStore.markDone(context, dedupKey)
 
         val target = Settings.getForwardTarget(context)
         val doTelegram = target == Settings.TARGET_TELEGRAM || target == Settings.TARGET_BOTH
@@ -56,11 +66,19 @@ object Forwarder {
             (doWechat && !wxReady && !doTelegram && !doRelay) ||
             (doRelay && !relayReady && !doTelegram && !doWechat) ||
             (doTelegram && doWechat && !tgReady && !wxReady)
-        ) return
+        ) {
+            SendLog.log(context, "未发送", "转发目标未配置")
+            return
+        }
+        val reconcileTag = if (isReconcile) "（对账补发）" else ""
+        SendLog.log(context, "收到", "发件人 $from$reconcileTag")
 
         // 关键词过滤：配置了关键词且一条都没命中 -> 不转发
         val keywords = Settings.getKeywordList(context)
-        if (keywords.isNotEmpty() && keywords.none { body.contains(it, ignoreCase = true) }) return
+        if (keywords.isNotEmpty() && keywords.none { body.contains(it, ignoreCase = true) }) {
+            SendLog.log(context, "已过滤", "关键词未命中")
+            return
+        }
 
         var aiNote: String? = null
         var shouldForward = true
@@ -78,7 +96,10 @@ object Forwarder {
                 }
             }
         }
-        if (!shouldForward) return // AI 判定为垃圾短信
+        if (!shouldForward) {
+            SendLog.log(context, "已过滤", "AI判定不转发")
+            return // AI 判定为垃圾短信
+        }
 
         val time = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
             .format(Date(timestamp))
@@ -103,13 +124,18 @@ object Forwarder {
             )
             if (id == null) {
                 // 发送失败 -> 进本地 outbox，下次重试
+                SendLog.log(context, "已入队", "发送失败，等待补发")
                 RelayOutbox.enqueue(
                     context, from, body, timestamp,
                     Settings.getDeviceName(context), aiNote
                 )
             } else {
+                SendLog.log(context, "已发送", "中转#$id")
                 // 顺手把之前积压的也发出
-                RelayOutbox.drain(context)
+                val left = RelayOutbox.drain(context)
+                if (left > 0) {
+                    SendLog.log(context, "补发", "仍有 $left 条未发出")
+                }
             }
         }
     }
