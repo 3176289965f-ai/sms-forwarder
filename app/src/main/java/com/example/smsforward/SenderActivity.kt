@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
@@ -17,11 +18,14 @@ import android.widget.TextView
 /**
  * v3 发送端配置页（装在收短信的备用机上）：
  * 转发目标（直连中转 / Telegram）→ 直连中转设置（点击展开）→ Telegram 设置（点击展开）→
- * 微信 ClawBot（折叠隐藏，灰度保留）→ Hachimi AI 预处理（点击展开）→ 关键词过滤 → 保活 → 测试。
+ * 微信 ClawBot（折叠隐藏，灰度保留）→ Hachimi AI 预处理（点击展开）→ 关键词过滤 → 发送记录。
+ * 保活设置 + 测试连通性收进左侧折叠栏（顶栏左上角气泡打开，点测试会自动收起折叠栏）。
  * 三个点击展开卡片：已配好之后默认收起（页面清爽），首次未配完的才默认展开。
  * 网络操作都在后台线程，主线程只更新 UI。
  */
 class SenderActivity : Activity() {
+
+    private var drawerOpen = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -158,6 +162,7 @@ class SenderActivity : Activity() {
         }
 
         btnTestRelay.setOnClickListener {
+            setDrawer(false)
             val baseUrl = etRelayUrl.text.toString().trim().trimEnd('/')
             val token = etRelayToken.text.toString().trim()
             val devName = etDeviceName.text.toString().trim().ifEmpty { "sender" }
@@ -169,6 +174,7 @@ class SenderActivity : Activity() {
         }
 
         btnTestTelegram.setOnClickListener {
+            setDrawer(false)
             val token = etToken.text.toString().trim()
             val chatId = etChatId.text.toString().trim()
             if (token.isBlank() || chatId.isBlank()) {
@@ -193,6 +199,7 @@ class SenderActivity : Activity() {
         }
 
         btnTestAi.setOnClickListener {
+            setDrawer(false)
             tvStatus.text = "正在请求 Hachimi…"
             val key = etHachimiKey.text.toString().trim()
             val model = etModel.text.toString().trim().ifEmpty { "gpt-6-astra" }
@@ -262,7 +269,45 @@ class SenderActivity : Activity() {
             }
         }
 
+        // ---- 左侧折叠栏（保活设置 + 测试连通性）：顶栏左上角气泡打开 ----
+        val drawerPanel = findViewById<LinearLayout>(R.id.drawerPanel)
+        val drawerScrim = findViewById<View>(R.id.drawerScrim)
+        // 首帧先藏到屏幕左侧，避免闪现
+        drawerPanel.post { drawerPanel.translationX = -drawerPanel.width.toFloat() }
+        drawerScrim.setOnClickListener { setDrawer(false) }
+
+        val bubble = findViewById<ImageView>(R.id.headerBubble)
+        bubble.setOnClickListener { setDrawer(true) }
+
         LiquidHeader.attach(this)
+    }
+
+    /** 左侧边栏开关（带遮罩淡入淡出） */
+    private fun setDrawer(open: Boolean) {
+        drawerOpen = open
+        val panel = findViewById<LinearLayout>(R.id.drawerPanel)
+        val scrim = findViewById<View>(R.id.drawerScrim)
+        if (open) {
+            panel.visibility = View.VISIBLE
+            scrim.visibility = View.VISIBLE
+            scrim.animate().alpha(0.45f).setDuration(180).start()
+            panel.animate().translationX(0f).setDuration(240).start()
+        } else {
+            scrim.animate().alpha(0f).setDuration(180).withEndAction {
+                scrim.visibility = View.GONE
+            }.start()
+            panel.animate().translationX(-panel.width.toFloat()).setDuration(240)
+                .withEndAction { panel.visibility = View.INVISIBLE }.start()
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    override fun onBackPressed() {
+        if (drawerOpen) {
+            setDrawer(false)
+            return
+        }
+        super.onBackPressed()
     }
 
     override fun onRequestPermissionsResult(

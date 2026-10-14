@@ -604,90 +604,6 @@
                     android:textSize="15sp" />
             </LinearLayout>
 
-            <!-- 保活提示 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/glass_card"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <View
-                        android:layout_width="4dp"
-                        android:layout_height="20dp"
-                        android:background="@drawable/glass_accent_bar" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="保活设置（国产 ROM 必看）"
-                        android:textColor="@color/glass_text_primary"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="设置 → 电池 → 短信转发 → 无限制 / 允许后台活动；允许自启动；把 App 锁定在多任务后台。\n直连中转要求手机能访问中转地址（EC2 公网地址，Wi-Fi / 流量均可）。"
-                    android:textColor="@color/glass_text_secondary"
-                    android:textSize="13sp" />
-
-                <Button
-                    android:id="@+id/btnBatteryWhitelist"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/glass_btn_secondary"
-                    android:padding="10dp"
-                    android:text="加入电池优化白名单（一键）"
-                    android:textColor="@color/glass_text_primary"
-                    android:textSize="14sp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="后台隐藏"
-                            android:textColor="@color/glass_text_primary"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="在「最近任务」隐藏卡片，防手滑划掉"
-                            android:textColor="@color/glass_text_secondary"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <Switch
-                        android:id="@+id/swHideRecents"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                </LinearLayout>
-            </LinearLayout>
-
             <!-- 发送记录：每条短信的接收/过滤/发送/入队都在这里，漏转时先看这里 -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -800,39 +716,6 @@
                 android:textStyle="bold" />
 
             <Button
-                android:id="@+id/btnTestRelay"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/glass_btn_secondary"
-                android:padding="12dp"
-                android:text="测试直连中转"
-                android:textColor="@color/glass_text_primary"
-                android:textSize="15sp" />
-
-            <Button
-                android:id="@+id/btnTestTelegram"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/glass_btn_secondary"
-                android:padding="12dp"
-                android:text="测试 Telegram 转发"
-                android:textColor="@color/glass_text_primary"
-                android:textSize="15sp" />
-
-            <Button
-                android:id="@+id/btnTestAi"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/glass_btn_secondary"
-                android:padding="12dp"
-                android:text="测试 Hachimi 连通性"
-                android:textColor="@color/glass_text_primary"
-                android:textSize="15sp" />
-
-            <Button
                 android:id="@+id/btnSwitchRole"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -882,13 +765,16 @@
             android:background="@drawable/liquid_glass_base"
             android:scaleType="fitXY" />
 
-        <!-- 气泡主体：融进玻璃内部左侧（tint 之下），边缘羽化，非贴图 -->
+        <!-- 气泡主体：左上角，点击打开左侧折叠栏 -->
         <ImageView
+            android:id="@+id/headerBubble"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_gravity="start|center_vertical"
             android:layout_marginStart="18dp"
             android:alpha="0.9"
+            android:clickable="true"
+            android:focusable="true"
             android:src="@drawable/header_bubbles" />
 
         <!-- 乳白 tint -->
@@ -910,5 +796,166 @@
             android:background="@drawable/liquid_glass_edge" />
 
     </FrameLayout>
+
+    <!-- 左侧折叠栏：遮罩 + 左滑面板（保活设置 + 测试连通性） -->
+    <View
+        android:id="@+id/drawerScrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:background="#80000000"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/drawerPanel"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@drawable/drawer_panel"
+        android:elevation="16dp"
+        android:orientation="vertical"
+        android:visibility="invisible">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- 保活设置 -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="保活设置"
+                    android:textColor="@color/glass_text_primary"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="设置 → 电池 → 短信转发 → 无限制 / 允许后台活动；允许自启动；把 App 锁定在多任务后台。\n直连中转要求手机能访问中转地址（EC2 公网地址，Wi-Fi / 流量均可）。"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/btnBatteryWhitelist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/glass_btn_secondary"
+                    android:padding="12dp"
+                    android:text="加入电池优化白名单（一键）"
+                    android:textColor="@color/glass_text_primary"
+                    android:textSize="14sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="后台隐藏"
+                            android:textColor="@color/glass_text_primary"
+                            android:textSize="15sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="在「最近任务」隐藏卡片，防手滑划掉"
+                            android:textColor="@color/glass_text_secondary"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <Switch
+                        android:id="@+id/swHideRecents"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <!-- 分隔线 -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="24dp"
+                    android:background="@color/glass_text_hint" />
+
+                <!-- 测试连通性 -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="测试连通性"
+                    android:textColor="@color/glass_text_primary"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="点一下就发一条测试消息，结果显示在页面底部的状态栏。"
+                    android:textColor="@color/glass_text_secondary"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/btnTestRelay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/glass_btn_secondary"
+                    android:padding="12dp"
+                    android:text="测试直连中转"
+                    android:textColor="@color/glass_text_primary"
+                    android:textSize="15sp" />
+
+                <Button
+                    android:id="@+id/btnTestTelegram"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/glass_btn_secondary"
+                    android:padding="12dp"
+                    android:text="测试 Telegram 转发"
+                    android:textColor="@color/glass_text_primary"
+                    android:textSize="15sp" />
+
+                <Button
+                    android:id="@+id/btnTestAi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/glass_btn_secondary"
+                    android:padding="12dp"
+                    android:text="测试 Hachimi 连通性"
+                    android:textColor="@color/glass_text_primary"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:gravity="center"
+                    android:text="点击空白处关闭"
+                    android:textColor="@color/glass_text_hint"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
 
 </FrameLayout>
