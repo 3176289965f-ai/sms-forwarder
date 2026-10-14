@@ -16,8 +16,9 @@ import android.widget.TextView
 
 /**
  * v3 发送端配置页（装在收短信的备用机上）：
- * 转发目标（直连中转 / Telegram）→ 中转设置 → Telegram 设置 →
- * 微信 ClawBot（折叠隐藏，灰度保留）→ Hachimi AI → 关键词过滤 → 保活 → 测试。
+ * 转发目标（直连中转 / Telegram）→ 直连中转设置（点击展开）→ Telegram 设置（点击展开）→
+ * 微信 ClawBot（折叠隐藏，灰度保留）→ Hachimi AI 预处理（点击展开）→ 关键词过滤 → 保活 → 测试。
+ * 三个点击展开卡片：已配好之后默认收起（页面清爽），首次未配完的才默认展开。
  * 网络操作都在后台线程，主线程只更新 UI。
  */
 class SenderActivity : Activity() {
@@ -54,7 +55,8 @@ class SenderActivity : Activity() {
         val btnBatteryWhitelist = findViewById<Button>(R.id.btnBatteryWhitelist)
 
         // 读取已保存的配置
-        when (Settings.getForwardTarget(this)) {
+        val target = Settings.getForwardTarget(this)
+        when (target) {
             Settings.TARGET_TELEGRAM -> rbTelegram.isChecked = true
             else -> rbRelay.isChecked = true // 默认直连中转（含从微信迁移过来的）
         }
@@ -110,6 +112,30 @@ class SenderActivity : Activity() {
                 "微信 ClawBot 设置（已暂停，点击展开查看）"
             }
         }
+
+        // 三个点击展开的卡片：已配完默认收起，首次未配完（或 AI 开启中）才默认展开
+        setupExpander(
+            findViewById(R.id.headerRelay),
+            findViewById(R.id.bodyRelay),
+            findViewById(R.id.chevronRelay),
+            expanded = target == Settings.TARGET_RELAY &&
+                    (Settings.getRelayUrl(this).isBlank() ||
+                            Settings.getRelayToken(this).isBlank())
+        )
+        setupExpander(
+            findViewById(R.id.headerTelegram),
+            findViewById(R.id.bodyTelegram),
+            findViewById(R.id.chevronTelegram),
+            expanded = target == Settings.TARGET_TELEGRAM &&
+                    (Settings.getTelegramToken(this).isBlank() ||
+                            Settings.getTelegramChatId(this).isBlank())
+        )
+        setupExpander(
+            findViewById(R.id.headerAi),
+            findViewById(R.id.bodyAi),
+            findViewById(R.id.chevronAi),
+            expanded = Settings.isAiEnabled(this)
+        )
 
         btnSave.setOnClickListener {
             val target = when (rgTarget.checkedRadioButtonId) {
@@ -261,6 +287,22 @@ class SenderActivity : Activity() {
             findViewById<Switch>(R.id.swReconcile)?.isChecked = false
             findViewById<TextView>(R.id.tvStatus)?.text =
                 "⚠️ 未授予「读取短信」权限，对账补发已关闭"
+        }
+    }
+
+    /** 点击展开/收起一个卡片，同步箭头朝向 */
+    private fun setupExpander(
+        header: LinearLayout,
+        body: LinearLayout,
+        chevron: TextView,
+        expanded: Boolean
+    ) {
+        body.visibility = if (expanded) View.VISIBLE else View.GONE
+        chevron.text = if (expanded) "▾" else "▸"
+        header.setOnClickListener {
+            val show = body.visibility != View.VISIBLE
+            body.visibility = if (show) View.VISIBLE else View.GONE
+            chevron.text = if (show) "▾" else "▸"
         }
     }
 

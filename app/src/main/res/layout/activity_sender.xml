@@ -92,26 +92,54 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <!-- 可点击标题行：展开/收起 -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:id="@+id/headerRelay"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <View
-                        android:layout_width="4dp"
-                        android:layout_height="20dp"
-                        android:background="@drawable/glass_accent_bar" />
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="4dp"
+                            android:layout_height="20dp"
+                            android:background="@drawable/glass_accent_bar" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="直连中转设置"
+                            android:textColor="@color/glass_text_primary"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                     <TextView
+                        android:id="@+id/chevronRelay"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="直连中转设置"
-                        android:textColor="@color/glass_text_primary"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
+                        android:text="▸"
+                        android:textColor="@color/glass_text_secondary"
+                        android:textSize="20sp" />
                 </LinearLayout>
+
+                <!-- 内容区：默认收起 -->
+                <LinearLayout
+                    android:id="@+id/bodyRelay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -180,6 +208,7 @@
                     android:textColor="@color/glass_text_primary"
                     android:textColorHint="@color/glass_text_hint"
                     android:textSize="15sp" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Telegram 设置 -->
@@ -191,26 +220,54 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <!-- 可点击标题行：展开/收起 -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:id="@+id/headerTelegram"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <View
-                        android:layout_width="4dp"
-                        android:layout_height="20dp"
-                        android:background="@drawable/glass_accent_bar" />
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="4dp"
+                            android:layout_height="20dp"
+                            android:background="@drawable/glass_accent_bar" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="Telegram 设置"
+                            android:textColor="@color/glass_text_primary"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                     <TextView
+                        android:id="@+id/chevronTelegram"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="Telegram 设置"
-                        android:textColor="@color/glass_text_primary"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
+                        android:text="▸"
+                        android:textColor="@color/glass_text_secondary"
+                        android:textSize="20sp" />
                 </LinearLayout>
+
+                <!-- 内容区：默认收起 -->
+                <LinearLayout
+                    android:id="@+id/bodyTelegram"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -256,6 +313,7 @@
                     android:textColor="@color/glass_text_primary"
                     android:textColorHint="@color/glass_text_hint"
                     android:textSize="15sp" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- 微信 ClawBot 设置（v3：折叠隐藏，灰度保留） -->
@@ -397,26 +455,54 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <!-- 可点击标题行：展开/收起 -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:id="@+id/headerAi"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <View
-                        android:layout_width="4dp"
-                        android:layout_height="20dp"
-                        android:background="@drawable/glass_accent_bar" />
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="4dp"
+                            android:layout_height="20dp"
+                            android:background="@drawable/glass_accent_bar" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="Hachimi AI 预处理（实验性）"
+                            android:textColor="@color/glass_text_primary"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                     <TextView
+                        android:id="@+id/chevronAi"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="Hachimi AI 预处理（实验性）"
-                        android:textColor="@color/glass_text_primary"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
+                        android:text="▸"
+                        android:textColor="@color/glass_text_secondary"
+                        android:textSize="20sp" />
                 </LinearLayout>
+
+                <!-- 内容区：默认收起 -->
+                <LinearLayout
+                    android:id="@+id/bodyAi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                 <Switch
                     android:id="@+id/swAi"
@@ -471,6 +557,7 @@
                     android:textColor="@color/glass_text_primary"
                     android:textColorHint="@color/glass_text_hint"
                     android:textSize="15sp" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- 关键词过滤 -->
