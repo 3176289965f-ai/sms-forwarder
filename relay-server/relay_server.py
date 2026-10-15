@@ -66,12 +66,28 @@ class Store:
 
     def add(self, sender, body, received_at, device, note):
         with self.lock:
+            sender = sender[:MAX_SENDER_LEN]
+            device = (device or "")[:100]
+            try:
+                received_at = int(received_at or 0)
+            except (ValueError, TypeError):
+                received_at = 0
+            # 去重：客户端发送超时会判定失败并重试，但服务器可能已经收到了
+            # （超时发生在等响应时），重试就会变成第二份。用"设备+发件人+时间戳"
+            # 判重，直接返回已有的 id，让客户端重试变成幂等操作。
+            # （2026-10-15：无去重导致接收端出现重复消息。）
+            if received_at > 0:
+                for m in self.messages:
+                    if (m.get("device") == device
+                            and m.get("sender") == sender
+                            and m.get("received_at") == received_at):
+                        return m["id"]
             msg = {
                 "id": self.next_id,
-                "sender": sender[:MAX_SENDER_LEN],
+                "sender": sender,
                 "body": body[:MAX_BODY_LEN],
-                "received_at": int(received_at or 0),
-                "device": (device or "")[:100],
+                "received_at": received_at,
+                "device": device,
                 "note": (note or "")[:500],
                 "server_at": int(time.time() * 1000),
             }

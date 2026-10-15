@@ -37,10 +37,13 @@ object Forwarder {
             Settings.getRole(context) != Settings.ROLE_UNSET
         ) return
 
-        // 去重：广播和对账可能撞到同一条短信，只处理一次
+        // 去重：广播和对账可能撞到同一条短信，只处理一次。
+        // 注意：标记必须放在"处理完"（发送成功 / 已入队 / 已过滤 / 目标未配置）之后，
+        // 绝不能放在开头——否则进程在发送中途被杀（国产 ROM 常见）会导致
+        // "标记了但没发出去"，而对账又会跳过已标记的，短信就静默丢失了。
+        // （2026-10-15 工商银行漏转就是这个原因：广播里标记了，发送前进程被杀。）
         val dedupKey = "$from|$timestamp"
         if (ForwardedStore.isDone(context, dedupKey)) return
-        ForwardedStore.markDone(context, dedupKey)
 
         val target = Settings.getForwardTarget(context)
         val doTelegram = target == Settings.TARGET_TELEGRAM || target == Settings.TARGET_BOTH
@@ -68,6 +71,7 @@ object Forwarder {
             (doTelegram && doWechat && !tgReady && !wxReady)
         ) {
             SendLog.log(context, "未发送", "转发目标未配置")
+            ForwardedStore.markDone(context, dedupKey)
             return
         }
         val reconcileTag = if (isReconcile) "（对账补发）" else ""
@@ -77,6 +81,7 @@ object Forwarder {
         val keywords = Settings.getKeywordList(context)
         if (keywords.isNotEmpty() && keywords.none { body.contains(it, ignoreCase = true) }) {
             SendLog.log(context, "已过滤", "关键词未命中")
+            ForwardedStore.markDone(context, dedupKey)
             return
         }
 
@@ -98,6 +103,7 @@ object Forwarder {
         }
         if (!shouldForward) {
             SendLog.log(context, "已过滤", "AI判定不转发")
+            ForwardedStore.markDone(context, dedupKey)
             return // AI 判定为垃圾短信
         }
 
@@ -138,6 +144,8 @@ object Forwarder {
                 }
             }
         }
+        // 所有发送分支走完才标记已处理（成功 / 已入队 / Telegram 发出都算）
+        ForwardedStore.markDone(context, dedupKey)
     }
 
     /**
